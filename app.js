@@ -8,6 +8,12 @@ app.get("/therapists", async (req, res) => {
     res.send(therapists)
 })
 
+app.get("/therapist/:id", async (req, res) => {
+    const id = req.params.id
+    const therapist = await getTherapist(id)
+    res.send(therapist)
+})
+
 app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send('Something broke!')
