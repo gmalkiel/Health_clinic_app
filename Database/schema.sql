@@ -32,6 +32,8 @@ CREATE TABLE Therapists (
     IDNumber VARCHAR(20) NOT NULL,
     DateOfBirth DATE,
     Email VARCHAR(255),
+    UserName VARCHAR(255),
+    T_Password VARCHAR(255),
     Phone VARCHAR(20)
 );
 CREATE TABLE Appointments (
@@ -73,14 +75,15 @@ CREATE TABLE TherapistPatients (
 INSERT INTO Managers (Name, IDNumber) VALUES ('Manager 1', 'M001');
 
 -- Insert Therapists
-INSERT INTO Therapists (Name, IDNumber, DateOfBirth, Email, Phone) VALUES
-('Therapist 1', 'T001', '1980-01-01', 'therapist1@example.com', '123-456-7890'),
-('Therapist 2', 'T002', '1982-02-02', 'therapist2@example.com', '123-456-7891'),
-('Therapist 3', 'T003', '1984-03-03', 'therapist3@example.com', '123-456-7892'),
-('Therapist 4', 'T004', '1986-04-04', 'therapist4@example.com', '123-456-7893'),
-('Therapist 5', 'T005', '1988-05-05', 'therapist5@example.com', '123-456-7894'),
-('Therapist 6', 'T006', '1990-06-06', 'therapist6@example.com', '123-456-7895'),
-('Therapist 7', 'T007', '1992-07-07', 'therapist7@example.com', '123-456-7896');
+    
+INSERT INTO Therapists (Name, IDNumber, DateOfBirth, Email,UserName,T_Password, Phone) VALUES
+('moshe', 'T001', '1980-01-01', 'therapist1@example.com','moshe','1589', '123-456-7890'),
+('chaym', 'T002', '1982-02-02', 'therapist2@example.com','chaym','1234', '123-456-7891'),
+('michal', 'T003', '1984-03-03', 'therapist3@example.com','michal','1756', '123-456-7892'),
+('Therapist 4', 'T004', '1986-04-04', 'therapist4@example.com','avi','1589', '123-456-7893'),
+('Therapist 5', 'T005', '1988-05-05', 'therapist5@example.com','avi','1589', '123-456-7894'),
+('Therapist 6', 'T006', '1990-06-06', 'therapist6@example.com','avi','1589', '123-456-7895'),
+('Therapist 7', 'T007', '1992-07-07', 'therapist7@example.com','avi','1589', '123-456-7896');
 
 -- Insert Patients
 INSERT INTO Patients (Name, Age, MaritalStatus, TreatmentGoals, SiblingPosition, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentDateTime) VALUES

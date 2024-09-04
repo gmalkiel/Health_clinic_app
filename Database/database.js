@@ -40,6 +40,10 @@ export async function createTherapist(Name, IDNumber, DateOfBirth, Email, Phone)
   return getTherapist(id)
 }
 
+export async function getTherapistByUsername(username) {
+  const [rows] = await pool.query('SELECT * FROM Therapists WHERE UserName = ?', [username]);
+  return rows[0];
+}
 //const therapist = await createTherapist("Oren", "555555", "1992-09-06", "therapist8@example.com", "123-456-7893")
 //console.log(therapist)
 

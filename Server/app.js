@@ -1,5 +1,5 @@
 import express from "express"
-import { getAllTherapists, getTherapist, createTherapist } from "../database.js"
+import { getAllTherapists, getTherapist, getTherapistByUsername } from "../database.js";
 
 const app = express()
 
@@ -18,7 +18,15 @@ app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send('Something broke!')
 })
-
+app.get("/therapist/username/:username", async (req, res) => {
+    const username = req.params.username;
+    const therapist = await getTherapistByUsername(username);
+    if (therapist) {
+        res.send(therapist);
+    } else {
+        res.status(404).send('Therapist not found');
+    }
+});
 app.listen(8080, () => {
     console.log('Server is running on port 8080')
 })
