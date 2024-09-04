@@ -1,5 +1,5 @@
 import express from "express"
-import { getAllTherapists, getTherapist, createTherapist } from "../database.js"
+import { getAllTherapists, getTherapist, createTherapist } from "../Server/database.js"
 
 const app = express()
 
