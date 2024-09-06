@@ -75,3 +75,4 @@ app.delete("/therapist/:id", async (req, res) => {
         res.status(500).send('Error deleting therapist');
     }
 });
+app.use(express.static('client'));
