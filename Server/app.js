@@ -59,3 +59,19 @@ app.put("/therapist/:id", async (req, res) => {
 app.listen(8080, () => {
     console.log('Server is running on port 8080')
 })
+
+app.delete("/therapist/:id", async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        const result = await db.deleteTherapist(id);
+        if (result.affectedRows > 0) {
+            res.send(`Therapist with ID ${id} has been deleted`);
+        } else {
+            res.status(404).send('Therapist not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error deleting therapist');
+    }
+});
