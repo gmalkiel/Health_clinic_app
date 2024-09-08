@@ -1,73 +1,112 @@
+/* General styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
 .login-container {
-    width: 300px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 2px solid #E2E2E2;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-  
-  .login-container h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .login-form .form-group {
-    position: relative;
-    margin-bottom: 15px;
-  }
-  
-  .login-form input {
-    width: 100%;
-    padding: 10px;
-    padding-left: 35px;
-    border: 1px solid #E2E2E2;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  .login-form input::placeholder {
-    color: #aaa;
-  }
-  
-  .login-form .form-group i {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    color: #aaa;
-  }
-  
-  .login-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4496C6; /* Neon green color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .login-button:hover {
-    background-color: #4496C6; /* Darker green on hover */
-  }
-  
-  .error {
-    color: red;
-  }
-  
-  .login-container p {
-    margin-top: 10px;
-    font-size: 14px;
-  }
-  
-  .login-container a {
-    color: #00A8E8;
-    text-decoration: none;
-  }
-  
-  .login-container a:hover {
-    text-decoration: underline;
-  }
-  
+  width: 400px;
+  background-color: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+/* Form styling */
+.login-form {
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group i {
+  position: absolute;
+  top: 50%;
+  margin-left: 10px;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.form-group input {
+  width: 90%;
+  padding: 10px 20px 10px 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  margin-right: 30px;
+  border-radius: 4px;
+  outline: none;
+  text-align: right;
+}
+
+.form-group input:focus {
+  border-color: #5cb85c;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-button:hover {
+  background-color: #218838;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Signup link */
+p {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+p a {
+  color: #28a745;
+  text-decoration: none;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* Manager button (כניסת מנהל) */
+.manager-button {
+  position: absolute;
+  top: -40px;
+  left: 20px;
+  background-color: #5cb85c;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.manager-button:hover {
+  background-color: #4cae4c;
+}
+

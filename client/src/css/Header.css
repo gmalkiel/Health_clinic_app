@@ -1,0 +1,68 @@
+.header {
+    display: flex;
+    justify-content: space-between; /* מפצל את האלמנטים לצדדים */
+    align-items: center;
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-bottom: 2px solid #c3e6cb; /* גבול תחתון */
+    width: 100%; /* ההדר יתפרס על כל הרוחב */
+    position: fixed; /* מיקום ההדר בראש הדף */
+    top: 0;
+     left: 0;
+    z-index: 1000; /* מבטיח שההדר יהיה מעל התוכן */
+}
+
+.manager-login {
+    display: flex;
+    justify-content: flex-end; /* מיישר את הכפתור לצד ימין */
+}
+
+
+
+
+.logo {
+    height: 60px; /* גודל הלוגו */
+    margin-right: 20px; /* ריווח מהצד */
+
+
+}
+
+
+.manager-button {
+    background-color: #4CAF50; /* צבע הכפתור */
+    /*color: white;*/
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center; /* ממרכז את הטקסט בכפתור */
+    margin-left: 20px; /* מרווח מהצד השמאלי */
+}
+
+
+.manager-button:hover {
+    background-color: #45a049;
+}
+
+/* Make sure there is enough space under the header */
+body {
+    padding-top: 100px; /* מוסיף ריווח כדי למנוע חפיפה עם תוכן הדף */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+  
+    .manager-login, .logo-container {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .logo {
+        height: 50px; /* גודל מותאם למסכים קטנים */
+    }
+}

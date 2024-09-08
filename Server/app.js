@@ -10,7 +10,7 @@ app.use(express.static('client'));
 
 // Configure CORS to allow requests from your frontend URL
 app.use(cors({
-    origin: 'http://localhost:5174' // Adjust the port if needed
+    origin: 'http://localhost:5173' // Adjust the port if needed
 }));
 
 app.use(express.json());
