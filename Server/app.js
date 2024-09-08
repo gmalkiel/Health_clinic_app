@@ -17,7 +17,16 @@ app.get("/therapists", async (req, res) => {
     const therapists = await db.getAllTherapists()
     res.send(therapists)
 })
-
+/*add for calender */
+app.get("/apointments", async (req, res) => {
+    const apointments = await db.getAllAppointments()
+    res.send(apointments)
+})
+app.get("/apointments/:id", async (req, res) => {
+    const id = req.params.id;
+    const apointments = await db.getAppointments(id)
+    res.send(apointments)
+})
 app.get("/therapist/:id", async (req, res) => {
     const id = req.params.id
     const therapist = await db.getTherapist(id)
@@ -200,14 +209,7 @@ app.delete("/patient/:id", async (req, res) => {
         res.status(500).send("Error deleting patient");
     }
 });
-
-
-
-
-
-
 //General functions
-
 app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send('Something broke!')

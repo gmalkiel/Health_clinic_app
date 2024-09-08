@@ -92,6 +92,40 @@ export async function getPatient(id) {
   `, [id]);
   return rows[0];
 }
+// Assuming you have a MySQL connection setup as `db`
+export async function getAllAppointments() {
+  const [rows] = await pool.query(`
+      SELECT 
+          a.AppointmentID,
+          a.StartDateTime,
+          a.EndDateTime,
+          a.Location,
+          a.Notes,
+          p.Name AS PatientName,
+          p.Age AS PatientAge,
+          t.Name AS TherapistName,
+          t.IDNumber AS TherapistIDNumber
+      FROM 
+          Appointments a
+      JOIN 
+          Patients p ON a.PatientID = p.PatientID
+      JOIN 
+          Therapists t ON a.TherapistID = t.TherapistID
+  `);
+  return rows;
+}
+
+
+export async function getAppointments(id) {
+  const [rows] = await pool.query(`
+    SELECT a.*, t.Name as TherapistName, p.Name as PatientName
+    FROM Appointments a
+    JOIN Therapists t ON a.TherapistID = t.TherapistID
+    JOIN Patients p ON a.PatientID = p.PatientID
+    WHERE a.TherapistID = ?
+  `, [id]);
+  return rows;
+}
 
 export async function getAllPatients() {
   const [rows] = await pool.query(`
@@ -186,11 +220,11 @@ export async function getSession(sessionId) {
   return rows[0];
 }
 
-export async function createSession(PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage) {
+export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
   const [result] = await pool.query(`
-  INSERT INTO Sessions (PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage)
+  INSERT INTO Sessions (PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage)
   VALUES (?, ?, ?, ?, ?)
-  `, [PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage]);
+  `, [PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage]);
   const sessionId = result.insertId;
   return getSession(sessionId);
 }

@@ -1,0 +1,12 @@
+.calendar-container {
+    height: 700px; /* גובה ברירת מחדל */
+    max-width: 100%; /* התאם לרוחב המסך */
+    overflow: auto; /* התאם את התצוגה במקרה של גלילה */
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+    .calendar-container {
+        height: 500px; /* גובה קטן יותר עבור מסכים קטנים */
+    }
+}
