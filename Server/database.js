@@ -95,6 +95,14 @@ export async function updateTherapist(id, Name, Email, Phone) {
   return getTherapist(id);
 }
 
+export async function deleteTherapist(id) {
+  const [result] = await pool.query(`
+      DELETE FROM Therapists WHERE TherapistID = ?
+  `, [id]);
+  return result;  
+}
+
+
 
 
 
