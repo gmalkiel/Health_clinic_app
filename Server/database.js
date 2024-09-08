@@ -186,11 +186,11 @@ export async function getSession(sessionId) {
   return rows[0];
 }
 
-export async function createSession(PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage) {
+export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
   const [result] = await pool.query(`
-  INSERT INTO Sessions (PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage)
+  INSERT INTO Sessions (PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage)
   VALUES (?, ?, ?, ?, ?)
-  `, [PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage]);
+  `, [PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage]);
   const sessionId = result.insertId;
   return getSession(sessionId);
 }

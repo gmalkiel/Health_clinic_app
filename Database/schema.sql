@@ -5,6 +5,57 @@ CREATE TABLE Patients (
     PatientID INTEGER PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(255) NOT NULL,
     Age INTEGER NOT NULL,
+    IDNumber VARCHAR(20) NOT NULL,
+    MaritalStatus VARCHAR(50),
+    TreatmentGoals TEXT,
+    SiblingPosition INTEGER,
+    SiblingsNumber INTEGER,
+    EducationalInstitution VARCHAR(255),
+    Diagnoses TEXT,
+    RiskLevel VARCHAR(50),
+    Medication TEXT,
+    ReferralSource VARCHAR(255),
+    RemainingSessions INTEGER,
+    RemainingPayment DECIMAL(10, 2),
+    AppointmentTime VARCHAR(255)
+);
+CREATE TABLE Appointments (
+    AppointmentID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    TherapistID INTEGER NOT NULL,
+    PatientID INTEGER NOT NULL,
+    AppointmentsDay VARCHAR(10) NOT NULL,
+    AppointmentsTime TIME NOT NUL
+    Location VARCHAR(255),
+    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE Sessions (
+    SessionID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    PatientID INTEGER,
+    SessionDate DATETIME NOT NULL,
+    SessionContent TEXT NOT NULL,
+    SessionSummary TEXT,
+    ArtworkImage BLOB,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE TherapistPatients (
+    TherapistID INTEGER NOT NULL,
+    PatientID INTEGER NOT NULL,
+    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    PRIMARY KEY (TherapistID, PatientID)
+    ON DELETE CASCADE
+);
+
+/*
+CREATE TABLE Patients (
+    PatientID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Age INTEGER NOT NULL,
     MaritalStatus VARCHAR(50),
     TreatmentGoals TEXT,
     SiblingPosition INTEGER,
@@ -67,6 +118,7 @@ CREATE TABLE TherapistPatients (
     FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
     PRIMARY KEY (TherapistID, PatientID)
 );
+*/
 
 
 -- Data Insert
