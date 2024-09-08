@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';      
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import bcrypt from 'bcryptjs';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -10,8 +11,34 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-   
-  };
+    e.preventDefault();
+    
+    try {
+        // Fetch user details by username
+        const response = await fetch(`http://localhost:8080/user/${username}`);
+
+        if (response.ok) {
+           const user = await response.json();
+           console.log(user);
+           // Verify the password (make sure you handle password comparison client-side)
+          // const isMatch = await bcrypt.compare(password, user.T_Password);
+           
+           if (password==user.T_Password) {
+               navigate('/home');
+           } else {
+               setError('Invalid password');
+           }
+        } else {
+            const errorText = await response.text(); // Get the error message
+            console.error('Fetch error:', errorText);
+            setError(errorText);
+        }
+    } catch (error) {
+       console.error('Login error:', error);
+       setError('An error occurred during login');
+    }
+};
+
 
  
 

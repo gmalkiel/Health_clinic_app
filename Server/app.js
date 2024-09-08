@@ -1,11 +1,19 @@
-import express from "express"
-import * as db from "../Server/database.js"
+import express from "express";
+import cors from "cors";
+import * as db from "../Server/database.js";
 //import { getAllTherapists, getTherapist, createTherapist, getTherapistByUsername } from "../Server/database.js"
 
 const app = express()
 
 app.use(express.json())
+app.use(express.static('client'));
 
+// Configure CORS to allow requests from your frontend URL
+app.use(cors({
+    origin: 'http://localhost:5174' // Adjust the port if needed
+}));
+
+app.use(express.json());
 app.get("/therapists", async (req, res) => {
     const therapists = await db.getAllTherapists()
     res.send(therapists)
@@ -28,13 +36,18 @@ app.post("/therapist", async (req, res) => {
     res.status(201).send(therapist)
 })
 
-app.get("/therapist/username/:username", async (req, res) => {
+app.get("/user/:username", async (req, res) => {
     const username = req.params.username;
-    const therapist = await db.getTherapistByUsername(username);
-    if (therapist) {
-        res.send(therapist);
-    } else {
-        res.status(404).send('Therapist not found');
+    try {
+        const user = await db.getTherapistByUsername(username); 
+        if (user) {
+            res.status(200).json(user); // Send user details as JSON
+        } else {
+            res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching user details');
     }
 });
 
@@ -59,4 +72,4 @@ app.put("/therapist/:id", async (req, res) => {
 app.listen(8080, () => {
     console.log('Server is running on port 8080')
 })
-app.use(express.static('client'));
+
