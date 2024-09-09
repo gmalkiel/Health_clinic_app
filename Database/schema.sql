@@ -28,6 +28,8 @@ CREATE TABLE Therapists (
     Email VARCHAR(255),
     UserName VARCHAR(255),
     T_Password VARCHAR(255),
+    Gender VARCHAR(255),
+    Adress VARCHAR(255),
     Phone VARCHAR(20)
 );
 

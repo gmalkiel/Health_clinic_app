@@ -8,7 +8,7 @@ const AddTherapist = () => {
     DateOfBirth: '',
     Email: '',
     UserName: '',
-    Password: '',
+    T_Password: '',
     Adress: '',
     Gender: '',
     Phone: ''
@@ -28,7 +28,13 @@ const AddTherapist = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+   const response = await fetch(`http://localhost:8080/user/${AddTherapist.UserName}`);
+if(response.ok){
+  setError('User already exists');
+  return;
 
+}
+else{
     try {
       const response = await fetch('http://localhost:8080/therapist', {
         method: 'POST',
@@ -38,7 +44,7 @@ const AddTherapist = () => {
         body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
+      if (response.statusCode == 200) {
         const result = await response.json();
         setSuccess('Therapist added successfully');
         console.log('Therapist added:', result);
@@ -51,6 +57,7 @@ const AddTherapist = () => {
       setError('Error adding therapist');
       console.error('Error:', error);
     }
+  }
   };
 
   return (

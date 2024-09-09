@@ -22,28 +22,14 @@ app.get("/therapist/:id", async (req, res) => {
 });
 
 app.post("/therapist", async (req, res) => {
-  const { Name, IDNumber, DateOfBirth, Email, UserName, T_Password, Adress, Gender, Phone } = req.body;
+  const { Name, IDNumber, DateOfBirth, Email, UserName, T_Password,Phone,Gender, Adress} = req.body;
 
   try {
-    // Check if username, email or IDNumber already exists
-    const existingTherapistByUsername = await db.getTherapistByUsername(UserName);
-    if (existingTherapistByUsername) {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
-
-    const existingTherapistByEmail = await db.getTherapistByEmail(Email);
-    if (existingTherapistByEmail) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
-
-    const existingTherapistByID = await db.getTherapistByIDNumber(IDNumber);
-    if (existingTherapistByID) {
-      return res.status(400).json({ error: 'ID Number already exists' });
-    }
-
+  
     // Create new therapist if no conflict
-    const therapist = await db.createTherapist(Name, IDNumber, DateOfBirth, Email, UserName, T_Password, Adress, Gender, Phone);
-    res.status(201).json(therapist);
+    const therapist = await db.createTherapist(Name, IDNumber, DateOfBirth, Email, UserName, T_Password,Phone,Gender, Adress);
+    console.log(therapist);
+    res.status(200).json(therapist);
 
   } catch (error) {
     console.error(error);

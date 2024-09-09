@@ -26,11 +26,11 @@ export async function getTherapist(id) {
   return rows[0]
 }
 
-export async function createTherapist(Name, IDNumber, DateOfBirth, Email, Phone) {
+export async function createTherapist(Name, IDNumber, DateOfBirth, Email, UserName, T_Password,Phone,Gender, Adress ) {
   const [result] = await pool.query(`
-  INSERT INTO Therapists (Name, IDNumber, DateOfBirth, Email, Phone)
-  VALUES (?, ?, ?, ?, ?)
-  `, [Name, IDNumber, DateOfBirth, Email, Phone])
+  INSERT INTO Therapists (Name, IDNumber, DateOfBirth, Email, UserName, T_Password,Phone,Gender, Adress)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [Name, IDNumber, DateOfBirth, Email, UserName, T_Password,Phone,Gender, Adress])
   const id = result.insertId
   return getTherapist(id)
 }
