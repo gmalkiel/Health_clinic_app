@@ -1,95 +1,43 @@
-/* Therapists.css */
-
-.patients-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    font-family: Arial, sans-serif;
-    margin-top: 15vh; /* Move content down by 15% of the viewport height */
+.patient-list-container {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Space between filter and table */
-}
-
-.filter-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Space between filter elements */
-    background-color: #f9f9f9; /* Background color for better visibility */
-    padding: 10px; /* Add padding */
-    border-radius: 8px; /* Rounded corners for better appearance */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
-}
-
-.filter-input,
-.filter-select,
-.filter-button {
     padding: 10px;
+    margin-top: 730px;
+  }
+  
+  .filters-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    direction: rtl; /* מימין לשמאל */
+  }
+  
+  .filters-container input,
+  .filters-container select {
+    margin-left: 10px; /* רווח בין האלמנטים */
+    padding: 5px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.filter-input {
-    width: 100%;
-    max-width: 300px;
-}
-
-.filter-select {
-    width: 150px;
-}
-
-.filter-button {
-    background-color: #388e3c;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    width: auto;
+  }
+  
+  .patient-row {
     display: flex;
     align-items: center;
-    gap: 5px;
-    flex-direction: row-reverse; /* Reverse the order of content so the icon is on the left */
-}
-
-.filter-button svg {
-    margin-right: 5px; /* Space between icon and text */
-}
-
-.patients-table-container {
-    flex-grow: 1; /* Allow the table to grow and fill the remaining space */
-    overflow: auto; /* Add scroll if the content overflows */
-}
-
-.patients-table {
-    width: 100%;
-    border-collapse: collapse;
-    direction: rtl; /* Right-to-left direction */
-}
-
-.table-header {
-    background-color: #388e3c;
-    color: #ffffff;
-    font-weight: bold;
-}
-
-.table-header th {
     padding: 10px;
-    text-align: right; /* Right align text for Hebrew */
-}
-
-.table-row {
-    border-bottom: 2px solid #d4e157;
-}
-
-.table-row:nth-child(even) {
-    background-color: #e8f5e9;
-}
-
-.table-row td {
-    padding: 15px;
-    text-align: right; /* Right align text for Hebrew */
-}
-
-.icon-cell {
-    text-align: right; /* Align icon to the right side of the cell */
-    padding-right: 10px; /* Add some padding to the right */
-}
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    direction: rtl; /* מימין לשמאל */
+  }
+  
+  .patient-row span {
+    margin-right: 15px; /* רווח בין השדות */
+  }
+  
+  .user-icon {
+    color: #4caf50;
+    font-size: 24px;
+    margin-left: 15px; /* האייקון בצד ימין */
+  }
+  
