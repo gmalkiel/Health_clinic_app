@@ -281,3 +281,8 @@ export async function getAppointment(appointmentId) {
   return rows[0];
 }
 
+export async function getTherapistByEmail(email) {
+  const [rows] = await pool.query('SELECT * FROM Therapists WHERE Email = ?', [email]);
+  return rows[0];
+}
+

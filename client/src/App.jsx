@@ -6,6 +6,8 @@ import Login from '../src/components/login';
 import Header from '../src/components/header';
 import Therapists from '/src/components/Therapists';
 import Patients from '../src/components/Patients';
+import AddTherapist from '../src/components/AddTherapist';
+
 
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />
         <Route path="/patients" element={<Patients />} />
+        <Route path="/addTherapist" element={<AddTherapist />} />
       </Routes>
     </Router>
   );

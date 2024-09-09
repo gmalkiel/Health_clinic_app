@@ -1,0 +1,57 @@
+.add-therapist-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #c3e6c0;
+    border-radius: 8px;
+    background-color: #e8f5e9; /* Light green background */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 350px;
+  }
+  
+  .add-therapist-form h2 {
+    text-align: center;
+    color: #2e7d32; /* Darker green for heading */
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #388e3c; /* Slightly darker green for labels */
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #a5d6a7;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #66bb6a; /* Green button */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #4caf50; /* Darker green on hover */
+  }
+  
+  .error {
+    color: #d32f2f; /* Red color for error messages */
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
