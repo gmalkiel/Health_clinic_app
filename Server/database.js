@@ -273,11 +273,34 @@ export async function getTherapistAppointments(id) {
 }
 
 export async function getAppointment(appointmentId) {
-  const [rows] = await pool.query(`
-  SELECT * 
-  FROM Appointments
-  WHERE AppointmentId = ?
+   // שאלת SQL שמחזירה פרטי פגישה ופרטי מטופלים
+   const [rows] = await pool.query(`
+    SELECT a.*, p.*
+    FROM Appointments a
+    JOIN Patients p ON a.PatientId = p.PatientId
+    WHERE a.AppointmentId = ?
   `, [appointmentId]);
-  return rows[0];
+
+  if (rows.length === 0) {
+    return null; // במקרה ואין פגישה עם מזהה כזה
+  }
+
+  const appointment = rows[0];
+  const patients = rows.map(row => ({
+    PatientId: row.PatientId,
+    FirstName: row.FirstName,
+    LastName: row.LastName,
+
+  }));
+
+  return {
+    Appointment: {
+      AppointmentId: appointment.AppointmentId,
+      Date: appointment.Date,
+      Time: appointment.Time,
+      // הוסף כאן פרטים נוספים של הפגישה במידת הצורך
+    },
+    Patients: patients
+  };
 }
 

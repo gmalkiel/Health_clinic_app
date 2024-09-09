@@ -3,9 +3,9 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import '../css/Schedule.css'; 
+import { FaPlus } from 'react-icons/fa';
 
 const localizer = momentLocalizer(moment);
-
 function generateRecurringAppointments(startDate, appointmentTime, count, frequency = 7, appointmentDetails) {
     const appointments = [];
     let currentDate = moment(startDate);
@@ -31,8 +31,6 @@ function generateRecurringAppointments(startDate, appointmentTime, count, freque
 
     return appointments;
 }
-
-
 const Schedule = ({ userType, username }) => {
     const [appointments, setAppointments] = useState([]);
     const [view, setView] = useState('month'); // Default view is month
@@ -87,10 +85,11 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-
+    
     return (
+        <>
         <div className="calendar-container">
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+          
             <Calendar
                 localizer={localizer}
                 events={appointments}
@@ -119,15 +118,20 @@ const Schedule = ({ userType, username }) => {
                 
                 style={{ height: '100%' }}
             />
-            {userType === 'therapist' && (
-                <button
-                    onClick={() => window.location.href = '/new-appointment'}
-                    style={{ marginTop: '20px', padding: '10px 20px' }}
-                >
-                    הוסף פגישה חדשה
-                </button>
+             {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
+        {/* הכפתור ממוקם בתחתית הדף, מעל הלו"ז */}
+        {userType === 'therapist' && (
+                <div className="add-appointment-overlay">
+                    <button
+                        onClick={() => window.location.href = '/add-appointment'}
+                    >
+                        <FaPlus /> {/* אייקון הפלוס */}
+                        הוספת פגישה
+                    </button>
+                </div>
             )}
-        </div>
+        </>
     );
 };
 
