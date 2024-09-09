@@ -55,11 +55,8 @@
     background-color: transparent;
     color: white;
     border: none;
-    display:flex;
-    position: relative;
-    right:10%;
+    display: flex;
     align-items: center;
-    
 }
 
 .add-appointment-overlay button:hover {

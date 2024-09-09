@@ -23,17 +23,33 @@ const AddTherapist = () => {
       [name]: value
     });
   };
-
+  const checkUserExists = async (userName) => {
+    try {
+      const response = await fetch(`http://localhost:8080/user/${userName}`);
+      if (response.ok) {
+        // המשתמש קיים
+        return true;
+      } else if (response.status === 404) {
+        // המשתמש לא קיים
+        return false;
+      } else {
+        // שגיאה אחרת
+        throw new Error('Failed to check user existence');
+      }
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      return false;
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-   const response = await fetch(`http://localhost:8080/user/${AddTherapist.UserName}`);
-if(response.ok){
-  setError('User already exists');
-  return;
-
-}
+  
+    if(checkUserExists(formData.UserName)){
+      setError('User already exists');
+      return;
+    }
 else{
     try {
       const response = await fetch('http://localhost:8080/therapist', {

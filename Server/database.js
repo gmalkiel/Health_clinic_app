@@ -37,8 +37,9 @@ export async function createTherapist(Name, IDNumber, DateOfBirth, Email, UserNa
 
 export async function getTherapistByUsername(username) {
   const [rows] = await pool.query('SELECT * FROM Therapists WHERE UserName = ?', [username]);
-  console.log(rows[0]);
-  return rows[0];
+  if(rows){
+  return rows[0]};
+  return null;
 }
 
 export async function updateTherapist(id, Name, Email, Phone) {

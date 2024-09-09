@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserAlt, FaSortUp, FaSortDown } from 'react-icons/fa'; // Import sort icons
 import '../css/Therapists.css'; // Import the CSS file
-
+import TherapistDetails from '../components/TherapistDetails.jsx'; 
+import { useNavigate } from 'react-router-dom';
 const Therapists = () => {
     const [therapists, setTherapists] = useState([]);
     const [filteredTherapists, setFilteredTherapists] = useState([]);
@@ -9,7 +10,7 @@ const Therapists = () => {
     const [genderFilter, setGenderFilter] = useState('');
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
     const [error, setError] = useState('');
-
+    const navigate = useNavigate(); // Initialize useNavigate
     useEffect(() => {
         const fetchTherapists = async () => {
             try {
@@ -68,6 +69,10 @@ const Therapists = () => {
         setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
     };
 
+    const handleRowClick = (therapist) => {
+        // Navigate to the therapist details page
+        navigate(`/therapist/${therapist.TherapistID}`);
+    };
     if (error) {
         return <div>{error}</div>;
     }
@@ -110,7 +115,7 @@ const Therapists = () => {
                     </thead>
                     <tbody>
                         {filteredTherapists.map((therapist) => (
-                            <tr key={therapist.TherapistID} className="table-row">
+                            <tr key={therapist.TherapistID} className="table-row"   onClick={() => handleRowClick(therapist)} >
                                 <td className="icon-cell"><FaUserAlt size={24} color="#388e3c" /></td>
                                 <td>{therapist.Name}</td>
                                 <td>{therapist.Email}</td>
