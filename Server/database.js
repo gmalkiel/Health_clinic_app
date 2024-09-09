@@ -103,27 +103,16 @@ export async function getAllPatients() {
 
 export async function getPatientsByTherapist(therapistId) {
   const [rows] = await pool.query(`
-  SELECT * 
-  FROM TherapistPatients 
-  WHERE TherapistID = ?
+    SELECT Patients.* 
+    FROM TherapistPatients 
+    JOIN Patients ON TherapistPatients.PatientID = Patients.PatientID
+    WHERE TherapistPatients.TherapistID = ?
   `, [therapistId]);
   return rows;
 }
 
-/*
-    "MaritalStatus": "Single",
-    "TreatmentGoals": "Goal 1",
-    "SiblingPosition": 1,
-    "EducationalInstitution": "Institution 1",
-    "Diagnoses": "Diagnosis 1",
-    "RiskLevel": "Low",
-    "Medication": "Medication 1",
-    "ReferralSource": "Referral 1",
-    "RemainingSessions": 10,
-    "RemainingPayment": "100.00",
-    "AppointmentDateTime": "2024-08-20T07:00:00.000Z"
-    
 
+/*
 export async function updatePatient(id, Name, Age, Email, Phone) {
   const [result] = await pool.query(`
   UPDATE Patients 
@@ -272,29 +261,6 @@ export async function getAllAppointments() {
   return rows;
 }
 
-/*export async function getAllAppointments() {
-  const [rows] = await pool.query(`
-      SELECT 
-          a.AppointmentID,
-          a.StartDateTime,
-          a.EndDateTime,
-          a.Location,
-          a.Notes,
-          p.Name AS PatientName,
-          p.Age AS PatientAge,
-          t.Name AS TherapistName,
-          t.IDNumber AS TherapistIDNumber
-      FROM 
-          Appointments a
-      JOIN 
-          Patients p ON a.PatientID = p.PatientID
-      JOIN 
-          Therapists t ON a.TherapistID = t.TherapistID
-  `);
-  return rows;
-}*/
-
-
 export async function getTherapistAppointments(id) {
   const [rows] = await pool.query(`
     SELECT a.*, t.Name as TherapistName, p.Name as PatientName
@@ -315,16 +281,3 @@ export async function getAppointment(appointmentId) {
   return rows[0];
 }
 
-
-
-/*
-export async function createPatient(Name, IDNumber, DateOfBirth, Email, Phone) {
-  const [result] = await pool.query(`
-  INSERT INTO Patients (Name, IDNumber, DateOfBirth, Email, Phone)
-  VALUES (?, ?, ?, ?, ?)
-  `, [Name, IDNumber, DateOfBirth, Email, Phone]);
-  const id = result.insertId;
-  return getPatient(id);
-}
-
-*/

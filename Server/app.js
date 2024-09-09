@@ -105,7 +105,7 @@ app.get("/patients", async (req, res) => {
     }
 });
 
-app.get("/therapist/:therapistID/patients", async (req, res) => {////////////
+app.get("/therapist/:therapistID/patients", async (req, res) => {
     const { therapistID } = req.params;
 
     try {
