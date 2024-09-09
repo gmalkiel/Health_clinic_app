@@ -67,7 +67,20 @@ app.put("/therapist/:id", async (req, res) => {
     res.status(500).send('Error updating therapist');
   }
 });
-
+app.get("/user/:username", async (req, res) => {
+    const username = req.params.username;
+    try {
+        const user = await db.getTherapistByUsername(username); 
+        if (user) {
+            res.status(200).json(user); 
+        } else {
+            res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching user details');
+    }
+});
 app.delete("/therapist/:id", async (req, res) => {///////////////
   const { id } = req.params;
 
