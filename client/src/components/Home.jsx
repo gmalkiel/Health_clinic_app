@@ -8,7 +8,8 @@ const Home = () => {
    <>
      <div>
             <h1>לו"ז פגישות</h1>
-            <CalendarComponent userType="admin" username="" />
+           
+            <CalendarComponent userType="therapist" username="moshe" />
         </div>
    </>
   );

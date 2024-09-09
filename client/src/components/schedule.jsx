@@ -2,44 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import '../css/Schedule.css'; // נניח שיש לך קובץ CSS
+import '../css/Schedule.css'; 
+import { FaPlus } from 'react-icons/fa';
 
 const localizer = momentLocalizer(moment);
-
-// פונקציה ליצירת פגישות מחזוריות
-function generateRecurringAppointments(startDate, endDate, frequency, appointmentDetails) {
+function generateRecurringAppointments(startDate, appointmentTime, count, frequency = 7, appointmentDetails) {
     const appointments = [];
     let currentDate = moment(startDate);
-  
-    while (currentDate.isBefore(endDate)) {
-      appointments.push({
-        ...appointmentDetails,
-        start: currentDate.toDate(),
-        end: currentDate.add(1, 'hour').toDate(), // משך הפגישה הוא שעה
-      });
-      currentDate.add(7, 'days'); // יצירת פגישות כל 7 ימים
+    
+    while (count) {
+        const start = moment(currentDate).set({
+            hour: moment(appointmentTime, 'HH:mm').hour(),
+            minute: moment(appointmentTime, 'HH:mm').minute(),
+            second: 0
+        }).toDate();
+        
+        const end = moment(start).add(1, 'hour').toDate(); // Duration of the appointment is one hour
+        
+        appointments.push({
+            ...appointmentDetails,
+            start: start,
+            end: end,
+        });
+        
+        currentDate.add(frequency, 'days'); // Generate appointments every 7 days
+        count--;
     }
-  
+
     return appointments;
-  }
+}
 const Schedule = ({ userType, username }) => {
     const [appointments, setAppointments] = useState([]);
-    const [view, setView] = useState('month'); // תצוגת ברירת מחדל לשבוע
+    const [view, setView] = useState('month'); // Default view is month
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [error, setError] = useState(''); // הגדרת משתנה error
+    const [error, setError] = useState(''); // Error state
 
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
                 let response;
                 if (userType === 'admin') {
-                    response = await fetch(`http://localhost:8080/apointments`); // לכל הפגישות
+                    response = await fetch(`http://localhost:8080/appointments`); // Fetch all appointments
                 } else {
                     let res = await fetch(`http://localhost:8080/user/${username}`);
                     if (res.ok) {
                         const user = await res.json();
-                        const TherapistId = user.TherapistId;
-                        response = await fetch(`http://localhost:8080/apointments/${TherapistId}`); // לפגישות של המטפל בלבד
+                        const TherapistId = user.TherapistID; // Adjust to match new field name
+                        response = await fetch(`http://localhost:8080/appointments/${TherapistId}`); // Fetch appointments for the therapist
                     } else {
                         const errorText = await res.text(); 
                         console.error('Fetch error:', errorText);
@@ -52,16 +61,17 @@ const Schedule = ({ userType, username }) => {
                     const data = await response.json();
                     const appointmentsData = data.flatMap((appt) => 
                         generateRecurringAppointments(
-                            new Date(appt.StartDateTime),
-                            new Date(appt.EndDateTime),
-                            'weekly', // מחזור שבועי, שנה לפי הצורך
+                            new Date(appt.AppointmentsDay), appt.AppointmentsTime, // שילוב תאריך ושעה
+                            4,
+                            7, // מחזור שבועי
                             {
                                 title: userType === 'admin' ? `${appt.PatientName} with ${appt.TherapistName}` : `${appt.PatientName}`,
-                                start: new Date(appt.StartDateTime),
-                                end: new Date(appt.EndDateTime),
+                                start: new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime), // תאריך ושעה
+                                end: new Date(new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime).getTime() + 60 * 60 * 1000), // הוספת שעה אחת
                             }
                         )
                     );
+                    
                     setAppointments(appointmentsData);
                 } else {
                     const errorText = await response.text();
@@ -75,10 +85,11 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-
+    
     return (
+        <>
         <div className="calendar-container">
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+          
             <Calendar
                 localizer={localizer}
                 events={appointments}
@@ -95,6 +106,7 @@ const Schedule = ({ userType, username }) => {
                         color: 'black'
                     }
                 })}
+                
                 components={{
                     event: ({ event }) => (
                         <span>
@@ -103,17 +115,23 @@ const Schedule = ({ userType, username }) => {
                         </span>
                     )
                 }}
+                
                 style={{ height: '100%' }}
             />
-            {userType === 'therapist' && (
-                <button
-                    onClick={() => window.location.href = '/new-appointment'}
-                    style={{ marginTop: '20px', padding: '10px 20px' }}
-                >
-                    הוסף פגישה חדשה
-                </button>
+             {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
+        {/* הכפתור ממוקם בתחתית הדף, מעל הלו"ז */}
+        {userType === 'therapist' && (
+                <div className="add-appointment-overlay">
+                    <button
+                        onClick={() => window.location.href = '/add-appointment'}
+                    >
+                        <FaPlus /> {/* אייקון הפלוס */}
+                        הוספת פגישה
+                    </button>
+                </div>
             )}
-        </div>
+        </>
     );
 };
 
