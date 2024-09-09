@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import DeleteTherapistModal from '../components/DeleteTherapistModal'
 import '../css/TherapistDetails .css'; // Import the CSS file
 
 const TherapistDetails = () => {
@@ -7,7 +8,7 @@ const TherapistDetails = () => {
     const navigate = useNavigate();
     const [therapist, setTherapist] = useState(null); // To store the therapist details
     const [error, setError] = useState('');
-
+    const [showModal, setShowModal] = useState(false); // Handle modal visibility
     useEffect(() => {
         const fetchTherapistDetails = async () => {
             try {
@@ -34,8 +35,8 @@ const TherapistDetails = () => {
     };
 
     const handleDelete = () => {
-        // Navigate to the page/component for deleting the therapist
-        navigate(`/delete-therapist/${TherapistID}`);
+        // Open the modal for delete confirmation
+        setShowModal(true);
     };
 
     if (!TherapistID) return <div className="error">Select a therapist to see details.</div>;
@@ -46,31 +47,43 @@ const TherapistDetails = () => {
 
     return (
         <div className="therapist-details">
-            <h2>Therapist Details</h2>
-            <div className="form-group">
-                <label>Name:</label>
-                <p>{therapist.Name}</p>
-            </div>
-            <div className="form-group">
-                <label>Email:</label>
-                <p>{therapist.Email}</p>
-            </div>
-            <div className="form-group">
-                <label>Phone:</label>
-                <p>{therapist.Phone}</p>
-            </div>
-            <div className="form-group">
-                <label>Address:</label>
-                <p>{therapist.Adress}</p> {/* Note: correct to Address if needed */}
-            </div>
-            <div className="form-group">
-                <label>Gender:</label>
-                <p>{therapist.Gender}</p>
-            </div>
-            <button onClick={handleViewPatients}>View Patients</button>
-            <button onClick={handleDelete}>Delete Therapist</button>
-        </div>
+        <h2>Therapist Details</h2>
+        {error && <div className="error">{error}</div>}
+        {therapist && (
+            <>
+                <div className="form-group">
+                    <label>Name:</label>
+                    <p>{therapist.Name}</p>
+                </div>
+                <div className="form-group">
+                    <label>Email:</label>
+                    <p>{therapist.Email}</p>
+                </div>
+                <div className="form-group">
+                    <label>Phone:</label>
+                    <p>{therapist.Phone}</p>
+                </div>
+                <div className="form-group">
+                    <label>Address:</label>
+                    <p>{therapist.Adress}</p>
+                </div>
+                <div className="form-group">
+                    <label>Gender:</label>
+                    <p>{therapist.Gender}</p>
+                </div>
+                <button onClick={handleViewPatients}>הצגת מטופלים</button>
+                <button onClick={handleDelete}>מחיקת מטפל</button>
+            </>
+        )}
+
+        {showModal && (
+            <DeleteTherapistModal
+                TherapistID={TherapistID}
+                onClose={() => setShowModal(false)} // Close modal when done
+            />
+        )}
+    </div>
+
     );
 };
-
 export default TherapistDetails;

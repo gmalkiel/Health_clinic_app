@@ -5,7 +5,7 @@
     max-width: 1200px;
     margin: auto;
     font-family: Arial, sans-serif;
-    margin-top: 15vh; /* Move content down by 15% of the viewport height */
+    margin-top: 2vh; /* Move content down by 15% of the viewport height */
     display: flex;
     flex-direction: column;
     gap: 20px; /* Space between filter and table */
