@@ -92,40 +92,6 @@ export async function getPatient(id) {
   `, [id]);
   return rows[0];
 }
-// Assuming you have a MySQL connection setup as `db`
-export async function getAllAppointments() {
-  const [rows] = await pool.query(`
-      SELECT 
-          a.AppointmentID,
-          a.StartDateTime,
-          a.EndDateTime,
-          a.Location,
-          a.Notes,
-          p.Name AS PatientName,
-          p.Age AS PatientAge,
-          t.Name AS TherapistName,
-          t.IDNumber AS TherapistIDNumber
-      FROM 
-          Appointments a
-      JOIN 
-          Patients p ON a.PatientID = p.PatientID
-      JOIN 
-          Therapists t ON a.TherapistID = t.TherapistID
-  `);
-  return rows;
-}
-
-
-export async function getAppointments(id) {
-  const [rows] = await pool.query(`
-    SELECT a.*, t.Name as TherapistName, p.Name as PatientName
-    FROM Appointments a
-    JOIN Therapists t ON a.TherapistID = t.TherapistID
-    JOIN Patients p ON a.PatientID = p.PatientID
-    WHERE a.TherapistID = ?
-  `, [id]);
-  return rows;
-}
 
 export async function getAllPatients() {
   const [rows] = await pool.query(`
@@ -260,29 +226,93 @@ export async function updateSession(id, SessionContent, SessionSummary, ArtworkI
 }
 
 export async function deletePatient(patientID) {
-  const connection = await pool.getConnection(); // יצירת חיבור לעבודה עם טרנזקציות
+  const connection = await pool.getConnection(); 
   try {
       await connection.beginTransaction();
 
-      // מחיקת הקשר עם המטפל מטבלת TherapistPatients
       await connection.query(`
           DELETE FROM TherapistPatients 
           WHERE PatientID = ?
       `, [patientID]);
 
-      // מחיקת המטופל מטבלת Patients
       await connection.query(`
           DELETE FROM Patients 
           WHERE PatientID = ?
       `, [patientID]);
 
-      await connection.commit(); // סיום טרנזקציה והתחייבות לשינויים
+      await connection.commit();
   } catch (error) {
-      await connection.rollback(); // במידה ויש שגיאה, מבטלים את כל השינויים
+      await connection.rollback();
       throw error;
   } finally {
-      connection.release(); // שחרור החיבור חזרה לבריכה
+      connection.release(); 
   }
+}
+
+//Appointments functions
+
+export async function getAllAppointments() {
+  const [rows] = await pool.query(`
+      SELECT 
+          a.AppointmentID,
+          a.AppointmentsDay,
+          a.AppointmentsTime,
+          a.Location,
+          p.Name AS PatientName,
+          p.Age AS PatientAge,
+          t.Name AS TherapistName,
+          t.IDNumber AS TherapistIDNumber
+      FROM 
+          Appointments a
+      JOIN 
+          Patients p ON a.PatientID = p.PatientID
+      JOIN 
+          Therapists t ON a.TherapistID = t.TherapistID
+  `);
+  return rows;
+}
+
+/*export async function getAllAppointments() {
+  const [rows] = await pool.query(`
+      SELECT 
+          a.AppointmentID,
+          a.StartDateTime,
+          a.EndDateTime,
+          a.Location,
+          a.Notes,
+          p.Name AS PatientName,
+          p.Age AS PatientAge,
+          t.Name AS TherapistName,
+          t.IDNumber AS TherapistIDNumber
+      FROM 
+          Appointments a
+      JOIN 
+          Patients p ON a.PatientID = p.PatientID
+      JOIN 
+          Therapists t ON a.TherapistID = t.TherapistID
+  `);
+  return rows;
+}*/
+
+
+export async function getTherapistAppointments(id) {
+  const [rows] = await pool.query(`
+    SELECT a.*, t.Name as TherapistName, p.Name as PatientName
+    FROM Appointments a
+    JOIN Therapists t ON a.TherapistID = t.TherapistID
+    JOIN Patients p ON a.PatientID = p.PatientID
+    WHERE a.TherapistID = ?
+  `, [id]);
+  return rows;
+}
+
+export async function getAppointment(appointmentId) {
+  const [rows] = await pool.query(`
+  SELECT * 
+  FROM Appointments
+  WHERE AppointmentId = ?
+  `, [appointmentId]);
+  return rows[0];
 }
 
 
@@ -298,27 +328,3 @@ export async function createPatient(Name, IDNumber, DateOfBirth, Email, Phone) {
 }
 
 */
-
-
-
-/*
-things to save just in case
-
-const therapist = await createTherapist("Oren", "555555", "1992-09-06", "therapist8@example.com", "123-456-7893")
-console.log(therapist)
-
-export async function updateTherapist(id, Name, Email, Phone) {
-  const therapist = await getTherapist(id);
-  const updatedName = Name || therapist.Name;
-  const updatedEmail = Email || therapist.Email;
-  const updatedPhone = Phone || therapist.Phone;
-  const [result] = await pool.query(`
-  UPDATE Therapists 
-  SET Name = ?, IDNumber = ?, DateOfBirth = ?, Email = ?, Phone = ?
-  WHERE TherapistID = ?
-  `, [Name, Email, Phone, id]);
-  return getTherapist(id);
-}
-
-const result = await pool.query("select * from Therapists")
-console.log(result)*/

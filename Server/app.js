@@ -17,16 +17,7 @@ app.get("/therapists", async (req, res) => {
     const therapists = await db.getAllTherapists()
     res.send(therapists)
 })
-/*add for calender */
-app.get("/apointments", async (req, res) => {
-    const apointments = await db.getAllAppointments()
-    res.send(apointments)
-})
-app.get("/apointments/:id", async (req, res) => {
-    const id = req.params.id;
-    const apointments = await db.getAppointments(id)
-    res.send(apointments)
-})
+
 app.get("/therapist/:id", async (req, res) => {
     const id = req.params.id
     const therapist = await db.getTherapist(id)
@@ -38,7 +29,7 @@ app.get("/user/:username", async (req, res) => {
     try {
         const user = await db.getTherapistByUsername(username); 
         if (user) {
-            res.status(200).json(user); // Send user details as JSON
+            res.status(200).json(user); 
         } else {
             res.status(404).send('User not found');
         }
@@ -71,7 +62,7 @@ app.put("/therapist/:id", async (req, res) => {
     }
 });
 
-app.delete("/therapist/:id", async (req, res) => {
+app.delete("/therapist/:id", async (req, res) => {///////////////
     const { id } = req.params;
     
     try {
@@ -114,7 +105,7 @@ app.get("/patients", async (req, res) => {
     }
 });
 
-app.get("/therapist/:therapistID/patients", async (req, res) => {
+app.get("/therapist/:therapistID/patients", async (req, res) => {////////////
     const { therapistID } = req.params;
 
     try {
@@ -168,6 +159,19 @@ app.post("/session/:PatientID", async (req, res) => {
     }
 });
 
+app.put("/session/:id", async (req, res) => {
+    const { id } = req.params;
+    const { SessionContent, SessionSummary, ArtworkImage } = req.body;
+
+    try {
+        const updatedSession = await db.updateSession(id, SessionContent, SessionSummary, ArtworkImage);
+        res.send(updatedSession);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating session');
+    }
+});
+/*
 app.delete("/patient/:id", async (req, res) => {
     const { id } = req.params;
     
@@ -184,31 +188,48 @@ app.delete("/patient/:id", async (req, res) => {
     }
 });
 
-app.put("/session/:id", async (req, res) => {
-    const { id } = req.params;
-    const { SessionContent, SessionSummary, ArtworkImage } = req.body;
-
-    try {
-        const updatedSession = await db.updateSession(id, SessionContent, SessionSummary, ArtworkImage);
-        res.send(updatedSession);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error updating session');
-    }
-});
-
 app.delete("/patient/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
-        // מחיקת המטופל ממסד הנתונים כולל מהטבלה המחברת
         await db.deletePatient(id);
         res.status(200).send(`Patient with ID ${id} and all related data have been deleted.`);
     } catch (error) {
         console.error(error);
         res.status(500).send("Error deleting patient");
     }
+});*/
+
+//Appointments functions
+
+/*add for calender */
+app.get("/appointments", async (req, res) => {
+    const apointments = await db.getAllAppointments()
+    res.send(apointments)
+})
+
+app.get("/appointments/:id", async (req, res) => {
+    const id = req.params.id;
+    const appointments = await db.getTherapistAppointments(id)
+    res.send(appointments)
+})
+
+app.get("/appointment/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const appointment = await db.getAppointment(id);
+        if (appointment) {
+            res.send(appointment);
+        } else {
+            res.status(404).send('Appointment not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error retrieving appointment');
+    }
 });
+
 //General functions
 app.use((err, req, res, next) => {
     console.error(err.stack)
