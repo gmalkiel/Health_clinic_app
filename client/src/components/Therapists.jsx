@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserAlt, FaSortUp, FaSortDown } from 'react-icons/fa'; // Import sort icons
 import '../css/Therapists.css'; // Import the CSS file
-import TherapistDetails from '../components/TherapistDetails.jsx'; 
 import { useNavigate } from 'react-router-dom';
+
 const Therapists = () => {
     const [therapists, setTherapists] = useState([]);
     const [filteredTherapists, setFilteredTherapists] = useState([]);
@@ -71,7 +71,9 @@ const Therapists = () => {
 
     const handleRowClick = (therapist) => {
         // Navigate to the therapist details page
+        
         navigate(`/therapist/${therapist.TherapistID}`);
+
     };
     if (error) {
         return <div>{error}</div>;

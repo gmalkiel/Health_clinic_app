@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import {useParams } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa'; // human icon
 import '../css/Patients.css'; // for styling
 
 
 const PatientList = () => {
+  const { TherapistID } = useParams(); // Get TherapistID from the URL
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [error, setError] = useState('');
@@ -13,17 +15,31 @@ const PatientList = () => {
 
   useEffect(() => {
     const fetchPatients = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/patients');
-        if (!response.ok) throw new Error('נכשלה בקבלת נתונים על מטופלים');
-        const data = await response.json();
-        setPatients(data);
-        setFilteredPatients(data);
-      } catch (error) {
-        console.error('שגיאה בקבלת המטופלים:', error);
-        setError('נכשלה טעינת המטופלים. אנא נסה שוב.');
-      }
-    };
+      if(!TherapistID){
+          try {
+            const response = await fetch('http://localhost:8080/patients');
+            if (!response.ok) throw new Error('נכשלה בקבלת נתונים על מטופלים');
+            const data = await response.json();
+            setPatients(data);
+            setFilteredPatients(data);
+          } catch (error) {
+            console.error('שגיאה בקבלת המטופלים:', error);
+            setError('נכשלה טעינת המטופלים. אנא נסה שוב.');
+          }
+        }
+        else{
+          try {
+            const response = await fetch(`http://localhost:8080/therapist/${TherapistID}/patients`);
+            if (!response.ok) throw new Error('נכשלה בקבלת נתונים על מטופלים');
+            const data = await response.json();
+            setPatients(data);
+            setFilteredPatients(data);
+          } catch (error) {
+            console.error('שגיאה בקבלת המטופלים:', error);
+            setError('נכשלה טעינת המטופלים. אנא נסה שוב.');
+          }
+        }
+         };
     fetchPatients();
   }, []);
 
