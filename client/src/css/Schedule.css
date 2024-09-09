@@ -1,7 +1,17 @@
 .calendar-container {
-    height: 700px; /* גובה ברירת מחדל */
-    max-width: 100%; /* התאם לרוחב המסך */
-    overflow: auto; /* התאם את התצוגה במקרה של גלילה */
+    display: flex;
+    justify-content: center; /* Centers the calendar horizontally */
+    align-items: center;     /* Centers the calendar vertically */
+    height: 100vh;           /* Full viewport height */
+    width: 100vw;            /* Full viewport width */
+    margin: auto;            /* Ensures it's centered */
+
+}
+
+.rbc-calendar {
+    width: 80%;              /* Adjust the width to make the calendar larger */
+    max-width:100%;        /* Set a maximum width */
+    height: 60%;             /* Adjust the height of the calendar */
 }
 
 /* התאמה למסכים קטנים */
