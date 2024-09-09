@@ -8,7 +8,7 @@ const AddTherapist = () => {
     DateOfBirth: '',
     Email: '',
     UserName: '',
-    T_Password: '',
+    Password: '',
     Adress: '',
     Gender: '',
     Phone: ''
@@ -71,7 +71,7 @@ const AddTherapist = () => {
             />
           </div>
         ))}
-        <button type="submit">Add Therapist</button>
+        <button class="addT" type="submit">Add Therapist</button>
       </form>
     </div>
   );
