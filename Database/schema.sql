@@ -7,18 +7,18 @@ CREATE TABLE Patients (
     Age INTEGER NOT NULL,
     IDNumber VARCHAR(20) NOT NULL,
     MaritalStatus VARCHAR(50),
-    TreatmentGoals TEXT,
+    TreatmentGoals TEXT DEFAULT NULL,
     SiblingPosition INTEGER,
     SiblingsNumber INTEGER,
     EducationalInstitution VARCHAR(255),
-    Diagnoses TEXT,
-    RiskLevel VARCHAR(50),
-    Medication TEXT,
-    ReferralSource VARCHAR(255),
-    RemainingSessions INTEGER,
-    RemainingPayment DECIMAL(10, 2),
-    AppointmentTime VARCHAR(255),
-    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
+    Diagnoses TEXT DEFAULT NULL,
+    RiskLevel VARCHAR(50) DEFAULT NULL,
+    Medication TEXT DEFAULT NULL,
+    ReferralSource VARCHAR(255) DEFAULT NULL,
+    RemainingSessions INTEGER DEFAULT NULL,
+    RemainingPayment DECIMAL(10, 2) DEFAULT NULL,
+    AppointmentTime VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID)
 );
 
 CREATE TABLE Therapists (

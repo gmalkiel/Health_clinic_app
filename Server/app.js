@@ -98,14 +98,6 @@ app.get("/session/:id", async (req, res) => {
   }
 });
 
-app.post('/patient', async (req, res) => {
-    try {
-        const result = await createPatient(req.body);
-        res.status(201).json({ message: 'Patient created', patientId: result.insertId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 app.put('/patient/:id', async (req, res) => {
     try {
@@ -185,6 +177,84 @@ app.post("/session/:PatientID", async (req, res) => {
       res.status(500).send('Error creating session');
   }
 });
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
+            return res.status(400).send('Missing required fields');
+        }
+        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
+        res.status(201).send(newPatient);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+*/
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber) {
+            return res.status(400).send('Missing required fields');
+        }
+
+        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
+        const newPatient = await createPatient(
+            TherapistID, Name, Age, IDNumber, 
+            req.body.MaritalStatus || null, 
+            req.body.SiblingPosition || null,
+            req.body.SiblingsNumber || null, 
+            req.body.EducationalInstitution || null, 
+            req.body.Medication || null, 
+            req.body.ReferralSource || null
+        );
+
+        res.status(201).send({ patientId: newPatient });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});*/
+app.post('/addPatient', async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send('Request body is missing');
+    }
+    const { Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource, TherapistID } = req.body;
+
+    try {
+        // בדיקה אם כל השדות הנדרשים קיימים
+        if (!TherapistID || !Name || !Age || !IDNumber) {
+            return res.status(400).send('Missing required fields');
+        }
+
+        // קריאה לפונקציה להוספת המטופל ולביצוע הקישור למטפל
+        const newPatientId = await createPatient(
+            Name, Age, IDNumber, 
+            MaritalStatus || null, 
+            SiblingPosition || null, 
+            SiblingsNumber || null, 
+            EducationalInstitution || null, 
+            Medication || null, 
+            ReferralSource || null, 
+            TherapistID
+        );
+
+        res.status(201).send({ patientId: newPatientId });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+
+app.post('/patient', async (req, res) => {
+    try {
+        const result = await createPatient(req.body);
+        res.status(201).json({ message: 'Patient created', patientId: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+/*
 app.post("/Patient", async (req, res) => {
   const { Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions} = req.body;
   try {
@@ -195,7 +265,7 @@ app.post("/Patient", async (req, res) => {
       console.error(error);
       res.status(500).send('Error creating session');
   }
-});
+});*/
 /*מחיקת מטפל בדיקות */
 // Function to check for appointment conflicts
 app.post("/check-conflicts", async (req, res) => {
