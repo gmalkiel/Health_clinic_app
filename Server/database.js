@@ -292,10 +292,9 @@ export async function getSession(sessionId) {
   `, [sessionId]);
   return rows[0];
 }
-/*
-export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
-  const imagePath = path.resolve(ArtworkImagePath);
-  const imageData = fs.readFileSync(imagePath);
+
+export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+  setSuccess('im in create');
   const [result] = await pool.query(`
     INSERT INTO health_clinic.Sessions (sessionContent, sessionSummary, patientId, artworkImage, SessionDate)
     VALUES (?, ?, ?, ?, ?)
@@ -304,21 +303,7 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
   const id = result.insertId;
   return getSession(id); // Assuming you have a getSession function
 }
-*/
-export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
-  //const path = require('path');
-  //const fs = require('fs');
-  //const imagePath = path.resolve(ArtworkImagePath); // ודא ש-ArtworkImagePath הוא נתיב קובץ חוקי
-  //const imageData = fs.readFileSync(imagePath);
 
-  const [result] = await pool.query(`
-    INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
-    VALUES (?, ?, ?, ?, ?)
-  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
-
-  const id = result.insertId;
-  return getSession(id); // Assuming you have a getSession function
-}
 
 
 export async function updateSession(id, SessionContent, SessionSummary, ArtworkImage) {

@@ -1,9 +1,6 @@
 import express from "express";
 import cors from "cors";
 import * as db from "../Server/database.js";
-import fs from 'fs';
-import path from 'path';
-
 
 
 const app = express();
@@ -186,20 +183,20 @@ app.post("/therapist", async (req, res) => {
 
 app.post('/session/:PatientID', async (req, res) => {
   const { PatientID } = req.params;
-  const { SessionContent, SessionSummary, ImagePath } = req.body;
+  const { SessionContent, SessionSummary, ImagePath,CurrentDate } = req.body;
 
   try {
-    // Get current date
-    const currentDate = new Date();
+   
 
     // Insert data into database
-    const newSession = await db.createSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
+    const newSession = await db.createSession(PatientID, CurrentDate, SessionContent, SessionSummary, ImagePath);
     res.status(200).send(newSession);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error creating session');
   }
 });
+
 
 app.post('/addPatient', async (req, res) => {
     if (!req.body) {
