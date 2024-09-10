@@ -35,7 +35,8 @@ const Login = () => {
            console.log(user);
            
            if (password === user.T_Password) {
-               navigate('/home');
+               //navigate('/home');
+               navigate(`/AddRestOfPatient/${3}`);
            } else {
                setError('Invalid password');
            }
