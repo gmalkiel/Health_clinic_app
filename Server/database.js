@@ -34,7 +34,7 @@ export async function createTherapist(Name, IDNumber, DateOfBirth, Email, UserNa
   const id = result.insertId
   return getTherapist(id)
 }
-
+/*
 export async function createPatient(
   Name, 
   Age, 
@@ -72,7 +72,7 @@ export async function createPatient(
     console.error('Error creating patient:', error);
     throw error;
   }
-}
+}*/
 
 
 export async function getTherapistByUsername(username) {
@@ -151,6 +151,109 @@ export async function getPatientsByTherapist(therapistId) {
   `, [therapistId]);
   return rows;
 }
+
+/*export async function createPatient(patientData) {
+  const { Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime } = patientData;
+  
+  const [result] = await pool.query(`
+      INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime]);
+
+  return result;
+}*/
+/*
+export async function createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null) {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
+  try {
+      // Insert into the Patients table
+      const [result] = await connection.query(`
+          INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource]);
+
+      const patientId = result.insertId; // Get the newly inserted PatientID
+
+      await connection.query(`
+          INSERT INTO TherapistPatients (TherapistID, PatientID)
+          VALUES (?, ?)
+      `, [TherapistID, patientId]); 
+
+      // Commit the transaction if both inserts are successful
+      await connection.commit();
+
+      return patientId;
+  } catch (error) {
+      // Rollback the transaction in case of an error
+      await connection.rollback();
+      throw error;
+  } finally {
+      // Release the connection back to the pool
+      connection.release();
+  }
+}*/
+
+export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null, TherapistID) {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
+  try {
+      // הכנסת המטופל לטבלת ה-Patients
+      const [result] = await connection.query(`
+          INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource]);
+
+      const patientId = result.insertId; // קבלת מזהה המטופל שנוצר
+
+      // הכנסת הקישור בין המטפל למטופל לטבלת TherapistPatients
+      await connection.query(`
+          INSERT INTO TherapistPatients (TherapistID, PatientID)
+          VALUES (?, ?)
+      `, [TherapistID, patientId]); 
+
+      // אישור העסקה במידה ושני השאילתות עברו בהצלחה
+      await connection.commit();
+
+      return patientId;
+  } catch (error) {
+      // ביטול העסקה במידה ויש שגיאה
+      await connection.rollback();
+      throw error;
+  } finally {
+      // שחרור החיבור חזרה לבריכה
+      connection.release();
+  }
+}
+
+
+
+export async function updatePatient(patientId, patientData) {
+  const updates = [];
+  const values = [];
+
+  for (const key in patientData) {
+      updates.push(`${key} = ?`);
+      values.push(patientData[key]);
+  }
+
+  values.push(patientId); // להוסיף את ה-ID של המטופל לסוף
+
+  await pool.query(`
+      UPDATE Patients
+      SET ${updates.join(', ')}
+      WHERE PatientID = ?
+  `, values);
+}
+/*
+export async function deletePatient(patientId) {
+  await pool.query(`
+      DELETE FROM Patients
+      WHERE PatientID = ?
+  `, [patientId]);
+}*/
 export async function isPatientExists(idNumber) {
   try {
     const [rows] = await pool.query(`
