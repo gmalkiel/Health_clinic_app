@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import '../css/AddTherapist.css'; // Import the CSS file
-
+import { useNavigate } from 'react-router-dom';
 const AddTherapist = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Name: '',
     IDNumber: '',
@@ -45,36 +46,40 @@ const AddTherapist = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
+    // Wait for the result of checkUserExists
+    const userExists = await checkUserExists(formData.UserName);
   
-    if(checkUserExists(formData.UserName)){
+    if (userExists) {
       setError('User already exists');
       return;
-    }
-else{
-    try {
-      const response = await fetch('http://localhost:8080/therapist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.statusCode == 200) {
-        const result = await response.json();
-        setSuccess('Therapist added successfully');
-        console.log('Therapist added:', result);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error adding therapist');
-        console.error('Error adding therapist:', errorData.error);
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/therapist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+  
+        if (response.ok) {
+          const result = await response.json();
+          setSuccess('Therapist added successfully');
+          console.log('Therapist added:', result);
+          navigate('/therapists');
+        } else {
+          const errorData = await response.json();
+          setError(errorData.error || 'Error adding therapist');
+          console.error('Error adding therapist:', errorData.error);
+        }
+      } catch (error) {
+        setError('Error adding therapist');
+        console.error('Error:', error);
       }
-    } catch (error) {
-      setError('Error adding therapist');
-      console.error('Error:', error);
     }
-  }
   };
+  
 
   return (
     <div className="add-therapist-form">
