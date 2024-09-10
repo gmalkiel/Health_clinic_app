@@ -22,7 +22,7 @@ function App() {
         <Route path="/therapists" element={<Therapists />} />
         <Route path="/therapist/:TherapistID" element={<TherapistDetails />} />
         <Route path="/patients" element={<Patients />} />
-        <Route path="/patients/:therapistId" element={<Patients />} />
+        <Route path="/patients/:TherapistID" element={<Patients />} />
         <Route path="/addTherapist" element={<AddTherapist />} />
         {/*טיפול במצב מחיקה של מטפל מה לעשות עם מטופלים שקשורים אליו האם למחוק אותם או לשייך אותם למטפל אחר? 
         <Route path="/delete-therapist/:id" element={<DeleteTherapist />} />*/}

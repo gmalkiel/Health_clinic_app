@@ -313,10 +313,9 @@ export async function getTherapistByEmail(email) {
 /* פונקציות בכדי לבצע מחיקה נכונה של מטפל*/
 export async function transferPatients(oldTherapistID, newTherapistID) {
   const [result] = await pool.query(`
-    UPDATE Patients p
-    JOIN Appointments a ON p.PatientID = a.PatientID
-    SET a.TherapistID = ?
-    WHERE a.TherapistID = ?
+    UPDATE TherapistPatients tp
+    SET tp.TherapistID = ?
+    WHERE tp.TherapistID = ?
   `, [newTherapistID, oldTherapistID]);
   return result;
 }
