@@ -184,20 +184,18 @@ app.post("/session/:PatientID", async (req, res) => {
   }
 });
 
-app.post('/addPatient', async (req, res) => {
+app.post('/Patient', async (req, res) => {
     if (!req.body) {
         return res.status(400).send('Request body is missing');
     }
     const { Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource, TherapistID } = req.body;
 
     try {
-        // בדיקה אם כל השדות הנדרשים קיימים
         if (!TherapistID || !Name || !Age || !IDNumber) {
             return res.status(400).send('Missing required fields');
         }
 
-        // קריאה לפונקציה להוספת המטופל ולביצוע הקישור למטפל
-        const newPatientId = await createPatient(
+        const newPatientId = await db.createPatient(
             Name, Age, IDNumber, 
             MaritalStatus || null, 
             SiblingPosition || null, 
@@ -211,16 +209,6 @@ app.post('/addPatient', async (req, res) => {
         res.status(201).send({ patientId: newPatientId });
     } catch (error) {
         res.status(500).send(error.message);
-    }
-});
-
-
-app.post('/patient', async (req, res) => {
-    try {
-        const result = await createPatient(req.body);
-        res.status(201).json({ message: 'Patient created', patientId: result.insertId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
     }
 });
 
