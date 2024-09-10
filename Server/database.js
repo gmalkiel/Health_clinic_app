@@ -35,6 +35,46 @@ export async function createTherapist(Name, IDNumber, DateOfBirth, Email, UserNa
   return getTherapist(id)
 }
 
+export async function createPatient(
+  Name, 
+  Age, 
+  MaritalStatus, 
+  SiblingPosition, 
+  SiblingsNumber, 
+  IDNumber, 
+  EducationalInstitution, 
+  ReferralSource, // First occurrence of ReferralSource
+  RemainingPayment, 
+  TherapistID, 
+  RemainingSessions,
+  TreatmentGoals = "nop",
+  Diagnoses = "nop",
+  RiskLevel = "nop",
+  Medication = "nop",
+ // Renamed to avoid duplicate parameter name
+)  {
+  try {
+    const [result] = await pool.query(`
+      INSERT INTO Patients (Name, Age, IDNumber,MaritalStatus, TreatmentGoals,SiblingPosition, SiblingsNumber, EducationalInstitution,Diagnoses,RiskLevel,Medication, ReferralSource, RemainingSessions , RemainingPayment)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+    `, [Name, Age, IDNumber,MaritalStatus, TreatmentGoals,SiblingPosition, SiblingsNumber, EducationalInstitution,Diagnoses,RiskLevel,Medication, ReferralSource, RemainingSessions , RemainingPayment]);
+
+    const patientId = result.insertId;
+
+    // Insert into TherapistPatients table as well
+    await pool.query(`
+      INSERT INTO TherapistPatients (TherapistID, PatientID)
+      VALUES (?, ?)
+    `, [TherapistID, patientId]);
+
+    return getPatient(patientId);
+  } catch (error) {
+    console.error('Error creating patient:', error);
+    throw error;
+  }
+}
+
+
 export async function getTherapistByUsername(username) {
   const [rows] = await pool.query('SELECT * FROM Therapists WHERE UserName = ?', [username]);
   if(rows){
@@ -111,7 +151,21 @@ export async function getPatientsByTherapist(therapistId) {
   `, [therapistId]);
   return rows;
 }
+export async function isPatientExists(idNumber) {
+  try {
+    const [rows] = await pool.query(`
+      SELECT COUNT(*) AS count
+      FROM Patients
+      WHERE IDNumber = ?
+    `, [idNumber]);
 
+    // אם ספירת הרשומות גדולה מ-0, המטופל קיים במערכת
+    return rows[0].count > 0;
+  } catch (error) {
+    console.error('Error checking if patient exists:', error);
+    throw error;
+  }
+}
 
 /*
 export async function updatePatient(id, Name, Age, Email, Phone) {
