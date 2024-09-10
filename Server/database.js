@@ -290,13 +290,12 @@ export async function getSession(sessionId) {
   return rows[0];
 }
 
-export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
-  const imagePath = path.resolve(ArtworkImagePath);
-  const imageData = fs.readFileSync(imagePath);
+export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+  setSuccess('im in create');
   const [result] = await pool.query(`
     INSERT INTO health_clinic.Sessions (sessionContent, sessionSummary, patientId, artworkImage, SessionDate)
     VALUES (?, ?, ?, ?, ?)
-  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+  `, [SessionDate,PatientID,SessionContent, SessionSummary, ArtworkImagePath ]);
 
   const id = result.insertId;
   return getSession(id); // Assuming you have a getSession function

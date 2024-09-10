@@ -10,8 +10,10 @@ const MeetingSummary = () => {
   const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
-    setImagePath(e.target.files[0].path); // Set file path
+    const file = e.target.files[0];
+    setImagePath(file.name); // Set file name, not path
   };
+  
 
   async function getPatientId(idNumber) {
     try {
@@ -28,9 +30,9 @@ const MeetingSummary = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const PatientId = await getPatientId(patientID);
-
+    const currentDate = new Date();
     try {
       const response = await fetch(`/session/${PatientId}`, {
         method: 'POST',
@@ -38,9 +40,11 @@ const MeetingSummary = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+           // Get current date
+          CurrentDate:currentDate,
           SessionContent: meetingContent,
           SessionSummary: summary,
-          PatientId: PatientId,
+          PatientID: PatientId,
           ImagePath: imagePath, // Send image path
         }),
       });
@@ -54,7 +58,7 @@ const MeetingSummary = () => {
       console.error('Error:', error);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <label>
