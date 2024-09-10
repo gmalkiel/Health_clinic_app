@@ -308,15 +308,20 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
 }
 
 export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
-  const imagePath = path.resolve(ArtworkImagePath); // resolve the absolute path
-  const imageData = fs.readFileSync(imagePath); // read the image data
-  const [result] = await pool.query(`
-    INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
-    VALUES (?, ?, ?, ?, ?)
-  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+  try {
+    const imagePath = path.resolve(ArtworkImagePath);
+    const imageData = fs.readFileSync(imagePath); // Read the image data as binary
+    const [result] = await pool.query(`
+      INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
+      VALUES (?, ?, ?, ?, ?)
+    `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
 
-  const id = result.insertId;
-  return getSession(id); // Assuming you have a getSession function
+    const id = result.insertId;
+    return getSession(id); // Assuming you have a getSession function
+  } catch (error) {
+    console.error('Error in createSession:', error.message);
+    throw error;
+  }
 }
 
 
