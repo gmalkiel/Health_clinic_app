@@ -197,6 +197,31 @@ app.post('/session/:PatientID', async (req, res) => {
   }
 });
 
+app.post('/addsession/:PatientID', async (req, res) => {
+  const { PatientID } = req.params;
+  const { SessionContent, SessionSummary, ImagePath } = req.body;
+
+  try {
+    // הצגת מידע שנשלח
+    console.log('Creating session for PatientID:', PatientID);
+    console.log('SessionContent:', SessionContent);
+    console.log('SessionSummary:', SessionSummary);
+    console.log('ImagePath:', ImagePath);
+
+    // Get current date
+    const currentDate = new Date();
+    console.log('Current Date:', currentDate);
+
+    // Insert data into database
+    const newSession = await db.createNewSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
+    res.status(200).send(newSession);
+  } catch (error) {
+    console.error('Error creating session:', error.message);
+    res.status(500).send('Error creating session');
+  }
+});
+
+
 
 app.post('/addPatient', async (req, res) => {
     if (!req.body) {

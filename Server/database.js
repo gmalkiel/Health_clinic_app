@@ -1,6 +1,9 @@
 import mysql from 'mysql2'
 
 import dotenv from 'dotenv'
+import path from 'path';
+import fs from 'fs';
+
 dotenv.config()
 
 
@@ -297,6 +300,18 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
   setSuccess('im in create');
   const [result] = await pool.query(`
     INSERT INTO health_clinic.Sessions (sessionContent, sessionSummary, patientId, artworkImage, SessionDate)
+    VALUES (?, ?, ?, ?, ?)
+  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+
+  const id = result.insertId;
+  return getSession(id); // Assuming you have a getSession function
+}
+
+export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+  const imagePath = path.resolve(ArtworkImagePath); // resolve the absolute path
+  const imageData = fs.readFileSync(imagePath); // read the image data
+  const [result] = await pool.query(`
+    INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
     VALUES (?, ?, ?, ?, ?)
   `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
 
