@@ -3,7 +3,6 @@ USE health_clinic;
 
 CREATE TABLE Patients (
     PatientID INTEGER PRIMARY KEY AUTO_INCREMENT,
-    TherapistID INTEGER NOT NULL,
     Name VARCHAR(255) NOT NULL,
     Age INTEGER NOT NULL,
     IDNumber VARCHAR(20) NOT NULL,
@@ -20,7 +19,6 @@ CREATE TABLE Patients (
     RemainingPayment DECIMAL(10, 2),
     AppointmentTime VARCHAR(255),
     FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
-    TherapistID INTEGER NOT NULL,
 );
 
 CREATE TABLE Therapists (

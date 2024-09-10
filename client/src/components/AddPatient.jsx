@@ -9,6 +9,7 @@ const AddPatient = () => {
     MaritalStatus: "",
     SiblingPosition: "",
     SiblingsNumber: "",
+    IDNumber:"",
     EducationalInstitution: "",
     ReferralSource: "",
     Payment: "",
@@ -19,7 +20,7 @@ const AddPatient = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/therapists")
+    fetch("http://localhost:8080/therapists")
       .then((response) => response.json())
       .then((data) => setTherapists(data))
       .catch((error) => console.error("Error fetching therapists:", error));
@@ -34,8 +35,8 @@ const AddPatient = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    fetch(`http://localhost:5000/api/patients/check?name=${formData.Name}&age=${formData.Age}`)
+  
+    fetch(`http://localhost:8080/patients/check/${formData.IDNumber}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.exists) {
@@ -46,8 +47,8 @@ const AddPatient = () => {
             RemainingPayment: -formData.Payment,
             RemainingSessions: 4,
           };
-
-          fetch("http://localhost:5000/api/patients", {
+  
+          fetch("http://localhost:8080/patient", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -67,7 +68,7 @@ const AddPatient = () => {
       })
       .catch((error) => console.error("Error checking patient:", error));
   };
-
+  
   return (
     <div className="add-patient-container">
       <h2>Add Patient</h2>
@@ -80,6 +81,17 @@ const AddPatient = () => {
             id="Name"
             name="Name"
             value={formData.Name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="Name">ID:</label>
+          <input
+            type="text"
+            id="IDNumber"
+            name="IDNumber"
+            value={formData.IDNumber}
             onChange={handleChange}
             required
           />
