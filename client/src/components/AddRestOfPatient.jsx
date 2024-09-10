@@ -18,7 +18,7 @@ const AddRestOfPatient = () => {
     useEffect(() => {
         const fetchPatientDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/patients/${PatientID}`);
+                const response = await fetch(`http://localhost:8080/patient/${PatientID}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch patient details');
                 }
@@ -52,7 +52,7 @@ const AddRestOfPatient = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        fetch(`http://localhost:8080/patients/${PatientID}`, {
+        fetch(`http://localhost:8080/patient/${PatientID}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
