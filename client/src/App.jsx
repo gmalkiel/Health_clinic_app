@@ -10,6 +10,8 @@ import AddTherapist from '../src/components/AddTherapist';
 //import DeleteTherapist from '../src/components/DeleteTherapist'; // Component to delete therapist
 import TherapistDetails from '../src/components/TherapistDetails';
 import AddPatient from '../src/components/AddPatient';
+import AddRestOfPatient from '../src/components/AddRestOfPatient';
+
 import MeetingSummary  from '../src/components/MeetingSummary';
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
         <Route path="/patients/:TherapistID" element={<Patients />} />
         <Route path="/addTherapist" element={<AddTherapist />} />
         <Route path="/addPatient" element={<AddPatient />} />
+        <Route path="/addRestOfPatient/:PatientID" element={<AddRestOfPatient />} />
+
         {/*טיפול במצב מחיקה של מטפל מה לעשות עם מטופלים שקשורים אליו האם למחוק אותם או לשייך אותם למטפל אחר? 
         <Route path="/delete-therapist/:id" element={<DeleteTherapist />} />*/}
       </Routes>

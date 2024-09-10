@@ -17,8 +17,7 @@ CREATE TABLE Patients (
     ReferralSource VARCHAR(255) DEFAULT NULL,
     RemainingSessions INTEGER DEFAULT NULL,
     RemainingPayment DECIMAL(10, 2) DEFAULT NULL,
-    AppointmentTime VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID)
+    AppointmentTime VARCHAR(255) DEFAULT NULL
 );
 
 CREATE TABLE Therapists (
@@ -65,6 +64,12 @@ CREATE TABLE TherapistPatients (
     PRIMARY KEY (TherapistID, PatientID)
 );
 
+CREATE TABLE Managers (
+    ManagerID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    IDNumber VARCHAR(20) NOT NULL
+);
+
 CREATE TABLE Forms (
     FormID INTEGER PRIMARY KEY AUTO_INCREMENT,
     PatientID INTEGER,
@@ -74,11 +79,7 @@ CREATE TABLE Forms (
     FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
 );
 
-CREATE TABLE Managers (
-    ManagerID INTEGER PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    IDNumber VARCHAR(20) NOT NULL
-);
+
 
 -- Data Insert
 
