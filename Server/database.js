@@ -112,6 +112,42 @@ export async function getPatientsByTherapist(therapistId) {
   return rows;
 }
 
+export async function createPatient(patientData) {
+  const { Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime } = patientData;
+  
+  const [result] = await pool.query(`
+      INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime]);
+
+  return result;
+}
+
+export async function updatePatient(patientId, patientData) {
+  const updates = [];
+  const values = [];
+
+  for (const key in patientData) {
+      updates.push(`${key} = ?`);
+      values.push(patientData[key]);
+  }
+
+  values.push(patientId); // להוסיף את ה-ID של המטופל לסוף
+
+  await pool.query(`
+      UPDATE Patients
+      SET ${updates.join(', ')}
+      WHERE PatientID = ?
+  `, values);
+}
+
+export async function deletePatient(patientId) {
+  await pool.query(`
+      DELETE FROM Patients
+      WHERE PatientID = ?
+  `, [patientId]);
+}
+
 
 /*
 export async function updatePatient(id, Name, Age, Email, Phone) {

@@ -150,6 +150,35 @@ app.get("/session/:id", async (req, res) => {
     }
 });
 
+app.post('/patient', async (req, res) => {
+    try {
+        const result = await createPatient(req.body);
+        res.status(201).json({ message: 'Patient created', patientId: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put('/patient/:id', async (req, res) => {
+    try {
+        await updatePatient(req.params.id, req.body);
+        res.status(200).json({ message: 'Patient updated' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.delete('/patient/:id', async (req, res) => {
+    try {
+        await deletePatient(req.params.id);
+        res.status(200).json({ message: 'Patient deleted' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//Sessions functions 
+
 app.post("/session/:PatientID", async (req, res) => {
     const {SessionContent, SessionSummary, ArtworkImage } = req.body;
     const { PatientID } = req.params
@@ -256,8 +285,8 @@ app.post("/check-conflicts", async (req, res) => {
       console.error(error);
       res.status(500).send('Error checking appointment conflicts');
     }
-  });
-  app.post("/transfer-patients", async (req, res) => {
+});
+app.post("/transfer-patients", async (req, res) => {
     const { oldTherapistID, newTherapistID } = req.body;
   
     try {
@@ -268,7 +297,7 @@ app.post("/check-conflicts", async (req, res) => {
       console.error(error);
       res.status(500).send('Error transferring patients');
     }
-  });
+});
   
 
 
