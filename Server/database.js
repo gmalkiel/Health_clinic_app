@@ -257,18 +257,29 @@ export async function deletePatient(patientId) {
 export async function isPatientExists(idNumber) {
   try {
     const [rows] = await pool.query(`
-      SELECT COUNT(*) AS count
+      SELECT PatientID
       FROM Patients
       WHERE IDNumber = ?
     `, [idNumber]);
 
-    // אם ספירת הרשומות גדולה מ-0, המטופל קיים במערכת
-    return rows[0].count > 0;
+    // אם יש תוצאה מהשאילתה, המטופל קיים במערכת
+    if (rows.length > 0) {
+      return {
+        exists: true,
+        patientID: rows[0].PatientID
+      };
+    } else {
+      return {
+        exists: false,
+        patientID: null
+      };
+    }
   } catch (error) {
     console.error('Error checking if patient exists:', error);
     throw error;
   }
 }
+
 
 /*
 export async function updatePatient(id, Name, Age, Email, Phone) {
