@@ -181,46 +181,65 @@ export async function updatePatient(patientId, patientData) {
 
   // If AppointmentTime is updated, create a new Appointment
   if (appointmentTimeUpdated) {
-      let therapistID;
+    let therapistID;
+
+    try {
+        // Retrieve the TherapistID associated with the patient
+        const query = `
+            SELECT TherapistID
+            FROM TherapistPatients
+            WHERE PatientID = ?
+        `;
+        console.log('Executing query:', query);
+        console.log('With values:', [patientIdInt]);
+
+        const [rows] = await pool.query(query, [patientIdInt]);
+
+        if (rows.length === 0) {
+            throw new Error('No associated therapist found for this patient');
+        }
+
+        therapistID = rows[0].TherapistID;
+    } catch (error) {
+        console.error('Error retrieving therapistID:', error.message);
+        throw error;
+    }
+
+    const [day, time] = patientData.AppointmentTime.split(' ');
 
       try {
-          const query = `
-              SELECT TherapistID
-              FROM TherapistPatients
-              WHERE PatientID = ?
+          // Check if an appointment with the same day and time already exists for the therapist
+          const checkQuery = `
+              SELECT COUNT(*) AS count
+              FROM Appointments
+              WHERE TherapistID = ?
+              AND AppointmentsDay = ?
+              AND AppointmentsTime = ?
           `;
-          console.log('Executing query:', query);
-          console.log('With values:', [patientIdInt]);
+          console.log('Executing query:', checkQuery);
+          console.log('With values:', [therapistID, day, time]);
 
-          const [rows] = await pool.query(query, [patientIdInt]);
+          const [[result]] = await pool.query(checkQuery, [therapistID, day, time]);
 
-          if (rows.length === 0) {
-              throw new Error('No associated therapist found for this patient');
+          if (result.count > 0) {
+              throw new Error('An appointment with the same day and time already exists for this therapist');
           }
 
-          therapistID = rows[0].TherapistID;
-      } catch (error) {
-          console.error('Error retrieving therapistID:', error.message);
-          throw error;
-      }
-
-      const [day, time] = patientData.AppointmentTime.split(' ');
-
-      // Insert the new appointment
-      try {
-          const query = `
+          // Insert the new appointment if no conflicts
+          const insertQuery = `
               INSERT INTO Appointments (TherapistID, PatientID, AppointmentsDay, AppointmentsTime, Location)
               VALUES (?, ?, ?, ?, ?)
           `;
-          console.log('Executing query:', query);
+          console.log('Executing query:', insertQuery);
           console.log('With values:', [therapistID, patientIdInt, day, time, '']); // Add Location if needed
 
-          await pool.query(query, [therapistID, patientIdInt, day, time, '']);
+          await pool.query(insertQuery, [therapistID, patientIdInt, day, time, '']);
       } catch (error) {
-          console.error('Error inserting appointment:', error.message);
+          console.error('Error processing appointment:', error.message);
           throw error;
-      }
+        }
   }
+
 }
 
 
