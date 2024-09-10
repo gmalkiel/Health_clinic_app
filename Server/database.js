@@ -3,6 +3,9 @@ import mysql from 'mysql2'
 import dotenv from 'dotenv'
 dotenv.config()
 
+
+
+
 const pool = mysql.createPool({
   host: '127.0.0.1',
   user:'root',
@@ -289,7 +292,7 @@ export async function getSession(sessionId) {
   `, [sessionId]);
   return rows[0];
 }
-
+/*
 export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
   const imagePath = path.resolve(ArtworkImagePath);
   const imageData = fs.readFileSync(imagePath);
@@ -301,7 +304,21 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
   const id = result.insertId;
   return getSession(id); // Assuming you have a getSession function
 }
+*/
+export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+  //const path = require('path');
+  //const fs = require('fs');
+  //const imagePath = path.resolve(ArtworkImagePath); // ודא ש-ArtworkImagePath הוא נתיב קובץ חוקי
+  //const imageData = fs.readFileSync(imagePath);
 
+  const [result] = await pool.query(`
+    INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
+    VALUES (?, ?, ?, ?, ?)
+  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+
+  const id = result.insertId;
+  return getSession(id); // Assuming you have a getSession function
+}
 
 
 export async function updateSession(id, SessionContent, SessionSummary, ArtworkImage) {
@@ -351,6 +368,12 @@ export async function deleteTherapist(therapistID) {
       WHERE TherapistID = ?
     `, [therapistID]);
 
+    // Delete messages related to the therapist
+    await connection.query(`
+      DELETE FROM Messages
+      WHERE TherapistID = ?
+    `, [therapistID]);
+
     // Delete the therapist from Therapists table
     const [result] = await connection.query(`
       DELETE FROM Therapists
@@ -366,6 +389,7 @@ export async function deleteTherapist(therapistID) {
     connection.release();
   }
 }
+
 
 //Appointments functions
 
@@ -448,138 +472,54 @@ export async function transferPatients(oldTherapistID, newTherapistID) {
   return result;
 }
 
-/*
-export async function createPatient(
-  Name, 
-  Age, 
-  MaritalStatus, 
-  SiblingPosition, 
-  SiblingsNumber, 
-  IDNumber, 
-  EducationalInstitution, 
-  ReferralSource, // First occurrence of ReferralSource
-  RemainingPayment, 
-  TherapistID, 
-  RemainingSessions,
-  TreatmentGoals = "nop",
-  Diagnoses = "nop",
-  RiskLevel = "nop",
-  Medication = "nop",
- // Renamed to avoid duplicate parameter name
-)  {
+
+export async function addMessage(therapistID, content) {
   try {
-    const [result] = await pool.query(`
-      INSERT INTO Patients (Name, Age, IDNumber,MaritalStatus, TreatmentGoals,SiblingPosition, SiblingsNumber, EducationalInstitution,Diagnoses,RiskLevel,Medication, ReferralSource, RemainingSessions , RemainingPayment)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
-    `, [Name, Age, IDNumber,MaritalStatus, TreatmentGoals,SiblingPosition, SiblingsNumber, EducationalInstitution,Diagnoses,RiskLevel,Medication, ReferralSource, RemainingSessions , RemainingPayment]);
-
-    const patientId = result.insertId;
-
-    // Insert into TherapistPatients table as well
-    await pool.query(`
-      INSERT INTO TherapistPatients (TherapistID, PatientID)
-      VALUES (?, ?)
-    `, [TherapistID, patientId]);
-
-    return getPatient(patientId);
-  } catch (error) {
-    console.error('Error creating patient:', error);
-    throw error;
-  }
-}*/
-
-
-/*
-export async function deletePatient(patientId) {
-  await pool.query(`
-      DELETE FROM Patients
-      WHERE PatientID = ?
-  `, [patientId]);
-}*/
-
-/*
-export async function updatePatient(id, Name, Age, Email, Phone) {
-  const [result] = await pool.query(`
-  UPDATE Patients 
-  SET Name = ?, IDNumber = ?, DateOfBirth = ?, Email = ?, Phone = ?
-  WHERE PatientID = ?
-  `, [Name, IDNumber, DateOfBirth, Email, Phone, id]);
-  return getPatient(id);
-}
-export async function updateTherapist(id, Name, Email, Phone) {
-  const therapist = await getTherapist(id);
-  const fieldsToUpdate = [];
-  const valuesToUpdate = [];
-
-  if (Name) {
-      fieldsToUpdate.push('Name = ?');
-      valuesToUpdate.push(Name);
-  }
-  if (Email) {
-      fieldsToUpdate.push('Email = ?');
-      valuesToUpdate.push(Email);
-  }
-  if (Phone) {
-      fieldsToUpdate.push('Phone = ?');
-      valuesToUpdate.push(Phone);
-  }
-
-  if (fieldsToUpdate.length === 0) {
-      throw new Error('No fields to update');
-  }
-
-  const sql = `
-    UPDATE Therapists 
-    SET ${fieldsToUpdate.join(', ')}
-    WHERE TherapistID = ?
-  `;
-  valuesToUpdate.push(id);
-
-  const [result] = await pool.query(sql, valuesToUpdate);
-
-  return getTherapist(id);
-}*/
-
-
-/*export async function createPatient(patientData) {
-  const { Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime } = patientData;
-  
-  const [result] = await pool.query(`
-      INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [Name, Age, IDNumber, MaritalStatus, TreatmentGoals, SiblingPosition, SiblingsNumber, EducationalInstitution, Diagnoses, RiskLevel, Medication, ReferralSource, RemainingSessions, RemainingPayment, AppointmentTime]);
-
-  return result;
-}*/
-/*
-export async function createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null) {
-  const connection = await pool.getConnection();
-  await connection.beginTransaction();
-
-  try {
-      // Insert into the Patients table
-      const [result] = await connection.query(`
-          INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource]);
-
-      const patientId = result.insertId; // Get the newly inserted PatientID
-
-      await connection.query(`
-          INSERT INTO TherapistPatients (TherapistID, PatientID)
+      const query = `
+          INSERT INTO Messages (TherapistID, Content)
           VALUES (?, ?)
-      `, [TherapistID, patientId]); 
+      `;
+      console.log('Executing query:', query);
+      console.log('With values:', [therapistID, content]);
 
-      // Commit the transaction if both inserts are successful
-      await connection.commit();
-
-      return patientId;
+      await pool.query(query, [therapistID, content]);
   } catch (error) {
-      // Rollback the transaction in case of an error
-      await connection.rollback();
+      console.error('Error inserting message:', error.message);
       throw error;
-  } finally {
-      // Release the connection back to the pool
-      connection.release();
   }
-}*/
+}
+
+export async function deleteMessage(messageID) {
+  try {
+      const query = `
+          DELETE FROM Messages
+          WHERE MessageID = ?
+      `;
+      console.log('Executing query:', query);
+      console.log('With values:', [messageID]);
+
+      await pool.query(query, [messageID]);
+  } catch (error) {
+      console.error('Error deleting message:', error.message);
+      throw error;
+  }
+}
+
+export async function getMessagesForTherapist(therapistID) {
+  try {
+      const query = `
+          SELECT MessageID, Content
+          FROM Messages
+          WHERE TherapistID = ?
+      `;
+      console.log('Executing query:', query);
+      console.log('With values:', [therapistID]);
+
+      const [rows] = await pool.query(query, [therapistID]);
+
+      return rows;
+  } catch (error) {
+      console.error('Error retrieving messages:', error.message);
+      throw error;
+  }
+}

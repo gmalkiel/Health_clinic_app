@@ -200,44 +200,7 @@ app.post('/session/:PatientID', async (req, res) => {
     res.status(500).send('Error creating session');
   }
 });
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
-            return res.status(400).send('Missing required fields');
-        }
-        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
-        res.status(201).send(newPatient);
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
-*/
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber) {
-            return res.status(400).send('Missing required fields');
-        }
 
-        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
-        const newPatient = await createPatient(
-            TherapistID, Name, Age, IDNumber, 
-            req.body.MaritalStatus || null, 
-            req.body.SiblingPosition || null,
-            req.body.SiblingsNumber || null, 
-            req.body.EducationalInstitution || null, 
-            req.body.Medication || null, 
-            req.body.ReferralSource || null
-        );
-
-        res.status(201).send({ patientId: newPatient });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});*/
 app.post('/addPatient', async (req, res) => {
     if (!req.body) {
         return res.status(400).send('Request body is missing');
@@ -365,7 +328,7 @@ app.put("/session/:id", async (req, res) => {
   }
 });
 /*DELETE*/
-app.delete("/therapist/:id", async (req, res) => {///////////////
+app.delete("/therapist/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -380,6 +343,52 @@ app.delete("/therapist/:id", async (req, res) => {///////////////
     res.status(500).send('Error deleting therapist');
   }
 });
+app.post('/message', async (req, res) => {
+  const { therapistID, content } = req.body;
+
+  if (!therapistID || !content) {
+      return res.status(400).send('TherapistID and content are required');
+  }
+
+  try {
+      await db.addMessage(therapistID, content);
+      res.status(201).send('Message added successfully');
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+app.delete('/message/:id', async (req, res) => {
+  const messageID = parseInt(req.params.id, 10);
+
+  if (isNaN(messageID)) {
+      return res.status(400).send('Invalid message ID');
+  }
+
+  try {
+      await db.deleteMessage(messageID);
+      res.status(200).send('Message deleted successfully');
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+app.get('/messages/:therapistID', async (req, res) => {
+  const therapistID = parseInt(req.params.therapistID, 10);
+
+  if (isNaN(therapistID)) {
+      return res.status(400).send('Invalid therapist ID');
+  }
+
+  try {
+      const messages = await db.getMessagesForTherapist(therapistID);
+      res.status(200).json(messages);
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+
 //General functions
 app.use((err, req, res, next) => {
     console.error(err.stack)

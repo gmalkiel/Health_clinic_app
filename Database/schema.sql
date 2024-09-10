@@ -1,6 +1,25 @@
 CREATE DATABASE health_clinic;
 USE health_clinic;
 
+-- מחיקת טבלת TherapistPatients (תלויה ב-Therapists ו-Patients)
+DROP TABLE IF EXISTS TherapistPatients;
+
+-- מחיקת טבלת Sessions (תלויה ב-Patients)
+DROP TABLE IF EXISTS Sessions;
+
+-- מחיקת טבלת Appointments (תלויה ב-Therapists ו-Patients)
+DROP TABLE IF EXISTS Appointments;
+
+-- מחיקת טבלת Patients (תלויה ב-Therapists)
+DROP TABLE IF EXISTS Patients;
+
+-- מחיקת טבלת Therapists
+DROP TABLE IF EXISTS Therapists;
+
+-- מחיקת טבלת Managers
+DROP TABLE IF EXISTS Managers;
+
+
 CREATE TABLE Patients (
     PatientID INTEGER PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(255) NOT NULL,
@@ -64,20 +83,20 @@ CREATE TABLE TherapistPatients (
     PRIMARY KEY (TherapistID, PatientID)
 );
 
+CREATE TABLE Messages (
+    MessageID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    TherapistID INTEGER NOT NULL,
+    Content TEXT NOT NULL,
+    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID) ON DELETE CASCADE
+);
+
 CREATE TABLE Managers (
     ManagerID INTEGER PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(255) NOT NULL,
     IDNumber VARCHAR(20) NOT NULL
 );
 
-CREATE TABLE Forms (
-    FormID INTEGER PRIMARY KEY AUTO_INCREMENT,
-    PatientID INTEGER,
-    FormType VARCHAR(255) NOT NULL,
-    FormContent TEXT,
-    UploadDocument BLOB,
-    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
-);
+
 
 
 
@@ -254,6 +273,14 @@ CREATE TABLE Appointments (
     Location VARCHAR(255),
     Notes TEXT,
     FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+);
+CREATE TABLE Forms (
+    FormID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    PatientID INTEGER,
+    FormType VARCHAR(255) NOT NULL,
+    FormContent TEXT,
+    UploadDocument BLOB,
     FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
 );
 */
