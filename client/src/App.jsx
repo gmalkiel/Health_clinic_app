@@ -10,7 +10,7 @@ import AddTherapist from '../src/components/AddTherapist';
 //import DeleteTherapist from '../src/components/DeleteTherapist'; // Component to delete therapist
 import TherapistDetails from '../src/components/TherapistDetails';
 import AddPatient from '../src/components/AddPatient';
-
+import MeetingSummary  from '../src/components/MeetingSummary';
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/meetingSummary" element={<MeetingSummary />} />
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />
         <Route path="/therapist/:TherapistID" element={<TherapistDetails />} />

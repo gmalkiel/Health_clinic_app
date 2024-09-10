@@ -210,14 +210,27 @@ app.get("/patients/check/:id", async (req, res) => {
   }
 
   try {
-    const exists = await db.isPatientExists(idNumber); 
+    const exists = (await db.isPatientExists(idNumber)).exists; 
     res.status(200).json({ exists });
   } catch (error) {
     console.error('Error checking if patient exists:', error);
     res.status(500).json({ error: 'Internal Server Error' }); // החזר שגיאה במקרה של בעיה
   }
 });
+app.get("/patients/getId/:id", async (req, res) => {
+  const idNumber =  req.params.id;
+  if (!idNumber) {
+    return res.status(400).json({ error: 'IDNumber is required' });
+  }
 
+  try {
+    const patientID = (await db.isPatientExists(idNumber)).patientID; 
+    res.status(200).json({ patientID });
+  } catch (error) {
+    console.error('Error checking if patient exists:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // החזר שגיאה במקרה של בעיה
+  }
+});
 /*UPDATE */
 app.put("/therapist/:id", async (req, res) => {
   const { id } = req.params;
@@ -263,12 +276,6 @@ app.delete("/therapist/:id", async (req, res) => {///////////////
     res.status(500).send('Error deleting therapist');
   }
 });
-
-
-
-
-
-
 //General functions
 app.use((err, req, res, next) => {
     console.error(err.stack)
