@@ -77,13 +77,6 @@ export async function updateTherapist(id, Name, Email, Phone) {
   return getTherapist(id);
 }
 
-export async function deleteTherapist(id) {
-  const [result] = await pool.query(`
-      DELETE FROM Therapists WHERE TherapistID = ?
-  `, [id]);
-  return result;  
-}
-
 //Patient functions
 
 export async function getPatient(id) {
@@ -119,53 +112,117 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
   await connection.beginTransaction();
 
   try {
-      // הכנסת המטופל לטבלת ה-Patients
       const [result] = await connection.query(`
           INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource]);
 
-      const patientId = result.insertId; // קבלת מזהה המטופל שנוצר
+      const patientId = result.insertId;
 
-      // הכנסת הקישור בין המטפל למטופל לטבלת TherapistPatients
       await connection.query(`
           INSERT INTO TherapistPatients (TherapistID, PatientID)
           VALUES (?, ?)
       `, [TherapistID, patientId]); 
 
-      // אישור העסקה במידה ושני השאילתות עברו בהצלחה
       await connection.commit();
 
       return patientId;
   } catch (error) {
-      // ביטול העסקה במידה ויש שגיאה
       await connection.rollback();
       throw error;
   } finally {
-      // שחרור החיבור חזרה לבריכה
       connection.release();
   }
 }
 
-
-
 export async function updatePatient(patientId, patientData) {
   const updates = [];
   const values = [];
+  let appointmentTimeUpdated = false;
+  // Ensure patientId is an integer
+  const patientIdInt = parseInt(patientId, 10);
 
-  for (const key in patientData) {
-      updates.push(`${key} = ?`);
-      values.push(patientData[key]);
+  // Check if patientIdInt is a valid number
+  if (isNaN(patientIdInt)) {
+      throw new Error('Invalid patientId provided');
   }
 
-  values.push(patientId); // להוסיף את ה-ID של המטופל לסוף
+  // Check if AppointmentTime is part of the update data
+  if (patientData.AppointmentTime) {
+      appointmentTimeUpdated = true;
+  }
 
-  await pool.query(`
-      UPDATE Patients
-      SET ${updates.join(', ')}
-      WHERE PatientID = ?
-  `, values);
+  // Build the update query
+  for (const key in patientData) {
+    updates.push(`${key} = ?`);
+    values.push(patientData[key]);
+  }
+
+  // Add the patientId to the values array
+  values.push(patientId); 
+
+  if (updates.length > 0) {
+      // Update the patient record
+      try {
+          const query = `
+              UPDATE Patients
+              SET ${updates.join(', ')}
+              WHERE PatientID = ?
+          `;
+          console.log('Executing query:', query);
+          console.log('With values:', values);
+
+          await pool.query(query, values);
+      } catch (error) {
+          console.error('Error updating patient:', error.message);
+          throw error;
+      }
+  }
+
+  // If AppointmentTime is updated, create a new Appointment
+  if (appointmentTimeUpdated) {
+      let therapistID;
+
+      try {
+          const query = `
+              SELECT TherapistID
+              FROM TherapistPatients
+              WHERE PatientID = ?
+          `;
+          console.log('Executing query:', query);
+          console.log('With values:', [patientIdInt]);
+
+          const [rows] = await pool.query(query, [patientIdInt]);
+
+          if (rows.length === 0) {
+              throw new Error('No associated therapist found for this patient');
+          }
+
+          therapistID = rows[0].TherapistID;
+      } catch (error) {
+          console.error('Error retrieving therapistID:', error.message);
+          throw error;
+      }
+
+      const [day, time] = patientData.AppointmentTime.split(' ');
+
+      // Insert the new appointment
+      try {
+          const query = `
+              INSERT INTO Appointments (TherapistID, PatientID, AppointmentsDay, AppointmentsTime, Location)
+              VALUES (?, ?, ?, ?, ?)
+          `;
+          console.log('Executing query:', query);
+          console.log('With values:', [therapistID, patientIdInt, day, time, '']); // Add Location if needed
+
+          await pool.query(query, [therapistID, patientIdInt, day, time, '']);
+      } catch (error) {
+          console.error('Error inserting appointment:', error.message);
+          throw error;
+      }
+  }
 }
+
 
 export async function isPatientExists(idNumber) {
   try {
@@ -253,27 +310,36 @@ export async function updateSession(id, SessionContent, SessionSummary, ArtworkI
   return getSession(id);
 }
 
-export async function deletePatient(patientID) {
-  const connection = await pool.getConnection(); 
+export async function deleteTherapist(therapistID) {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
   try {
-      await connection.beginTransaction();
+    // Delete appointments related to the therapist
+    await connection.query(`
+      DELETE FROM Appointments
+      WHERE TherapistID = ?
+    `, [therapistID]);
 
-      await connection.query(`
-          DELETE FROM TherapistPatients 
-          WHERE PatientID = ?
-      `, [patientID]);
+    // Delete the therapist from TherapistPatients table
+    await connection.query(`
+      DELETE FROM TherapistPatients
+      WHERE TherapistID = ?
+    `, [therapistID]);
 
-      await connection.query(`
-          DELETE FROM Patients 
-          WHERE PatientID = ?
-      `, [patientID]);
+    // Delete the therapist from Therapists table
+    const [result] = await connection.query(`
+      DELETE FROM Therapists
+      WHERE TherapistID = ?
+    `, [therapistID]);
 
-      await connection.commit();
+    await connection.commit();
+    return result;
   } catch (error) {
-      await connection.rollback();
-      throw error;
+    await connection.rollback();
+    throw error;
   } finally {
-      connection.release(); 
+    connection.release();
   }
 }
 

@@ -107,22 +107,29 @@ app.get("/session/:id", async (req, res) => {
 
 app.put('/patient/:id', async (req, res) => {
     try {
-        await updatePatient(req.params.id, req.body);
+        await db.updatePatient(req.params.id, req.body);
         res.status(200).json({ message: 'Patient updated' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-app.delete('/patient/:id', async (req, res) => {
-    try {
-        await deletePatient(req.params.id);
-        res.status(200).json({ message: 'Patient deleted' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// DELETE endpoint for deleting a therapist
+app.delete('/therapist/:id', async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const result = await db.deleteTherapist(id);
+    if (result.affectedRows > 0) {
+      res.send(`Therapist with ID ${id} has been deleted`);
+    } else {
+      res.status(404).send('Therapist not found');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error deleting therapist');
+  }
+});
 //Sessions functions 
 
 /*add for calender */
@@ -235,6 +242,7 @@ app.post("/check-conflicts", async (req, res) => {
     res.status(500).send('Error checking appointment conflicts');
   }
 });
+
 app.post("/transfer-patients", async (req, res) => {
   const { oldTherapistID, newTherapistID } = req.body;
 
@@ -247,6 +255,7 @@ app.post("/transfer-patients", async (req, res) => {
     res.status(500).send('Error transferring patients');
   }
 });
+
 /*check Duplicate Patients */
 app.get("/patients/check/:id", async (req, res) => {
   const idNumber =  req.params.id;
@@ -262,6 +271,7 @@ app.get("/patients/check/:id", async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' }); // החזר שגיאה במקרה של בעיה
   }
 });
+
 app.get("/patients/getId/:id", async (req, res) => {
   const idNumber =  req.params.id;
   if (!idNumber) {
@@ -276,6 +286,7 @@ app.get("/patients/getId/:id", async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' }); // החזר שגיאה במקרה של בעיה
   }
 });
+
 /*UPDATE */
 app.put("/therapist/:id", async (req, res) => {
   const { id } = req.params;
@@ -293,6 +304,7 @@ app.put("/therapist/:id", async (req, res) => {
     res.status(500).send('Error updating therapist');
   }
 });
+
 app.put("/session/:id", async (req, res) => {
   const { id } = req.params;
   const { SessionContent, SessionSummary, ArtworkImage } = req.body;
@@ -326,55 +338,3 @@ app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send('Something broke!')
 })
-
-
-/*
-app.post("/Patient", async (req, res) => {
-  const { Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions} = req.body;
-  try {
-    
-      const patient = await db.createPatient(Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions);
-      res.status(200).send(patient);
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Error creating session');
-  }
-});*/
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
-            return res.status(400).send('Missing required fields');
-        }
-        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
-        res.status(201).send(newPatient);
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
-*/
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber) {
-            return res.status(400).send('Missing required fields');
-        }
-
-        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
-        const newPatient = await createPatient(
-            TherapistID, Name, Age, IDNumber, 
-            req.body.MaritalStatus || null, 
-            req.body.SiblingPosition || null,
-            req.body.SiblingsNumber || null, 
-            req.body.EducationalInstitution || null, 
-            req.body.Medication || null, 
-            req.body.ReferralSource || null
-        );
-
-        res.status(201).send({ patientId: newPatient });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});*/
