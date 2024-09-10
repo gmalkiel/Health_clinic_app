@@ -17,7 +17,9 @@ CREATE TABLE Patients (
     ReferralSource VARCHAR(255),
     RemainingSessions INTEGER,
     RemainingPayment DECIMAL(10, 2),
-    AppointmentTime VARCHAR(255)
+    AppointmentTime VARCHAR(255),
+    FOREIGN KEY (TherapistID) REFERENCES Therapists(TherapistID),
+    TherapistID INTEGER NOT NULL,
 );
 
 CREATE TABLE Therapists (
