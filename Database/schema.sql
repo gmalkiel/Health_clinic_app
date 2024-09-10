@@ -51,7 +51,7 @@ CREATE TABLE Sessions (
     SessionDate DATETIME NOT NULL,
     SessionContent TEXT NOT NULL,
     SessionSummary TEXT,
-    ArtworkImage BLOB,
+    ArtworkImage TEXT,
     FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
     ON DELETE CASCADE
 );
