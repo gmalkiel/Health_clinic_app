@@ -21,8 +21,9 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />
-        <Route path="/therapist/:id" element={<TherapistDetails />} />
+        <Route path="/therapist/:TherapistID" element={<TherapistDetails />} />
         <Route path="/patients" element={<Patients />} />
+        <Route path="/patients/:TherapistID" element={<Patients />} />
         <Route path="/addTherapist" element={<AddTherapist />} />
         <Route path="/addPatient" element={<AddPatient />} />
         {/*טיפול במצב מחיקה של מטפל מה לעשות עם מטופלים שקשורים אליו האם למחוק אותם או לשייך אותם למטפל אחר? 

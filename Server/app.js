@@ -234,6 +234,43 @@ app.get("/appointment/:id", async (req, res) => {
         res.status(500).send('Error retrieving appointment');
     }
 });
+/*מחיקת מטפל בדיקות */
+// Function to check for appointment conflicts
+app.post("/check-conflicts", async (req, res) => {
+    const { oldTherapistID, newTherapistID } = req.body;
+    
+    try {
+      // Query to get appointments for both therapists
+      const oldTherapistAppointments = await db.getTherapistAppointments(oldTherapistID);
+      const newTherapistAppointments = await db.getTherapistAppointments(newTherapistID);
+      
+      // Check for conflicts (you could refine this based on specific criteria like date overlap)
+      const conflicts = oldTherapistAppointments.filter(oldAppt => 
+        newTherapistAppointments.some(newAppt => 
+          oldAppt.Date === newAppt.Date && oldAppt.Time === newAppt.Time
+        )
+      );
+  
+      res.json({ conflicts });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error checking appointment conflicts');
+    }
+  });
+  app.post("/transfer-patients", async (req, res) => {
+    const { oldTherapistID, newTherapistID } = req.body;
+  
+    try {
+      // Update the patients to be assigned to the new therapist
+      const result = await db.transferPatients(oldTherapistID, newTherapistID);
+      res.status(200).json({ message: 'Patients transferred successfully', affectedRows: result.affectedRows });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error transferring patients');
+    }
+  });
+  
+
 
 //General functions
 app.use((err, req, res, next) => {

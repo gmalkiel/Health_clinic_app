@@ -264,7 +264,7 @@ export async function getAllAppointments() {
 
 export async function getTherapistAppointments(id) {
   const [rows] = await pool.query(`
-    SELECT a.*, t.Name as TherapistName, p.Name as PatientName
+    SELECT a.*,  t.Name as TherapistName, p.Name as PatientName
     FROM Appointments a
     JOIN Therapists t ON a.TherapistID = t.TherapistID
     JOIN Patients p ON a.PatientID = p.PatientID
@@ -299,7 +299,7 @@ export async function getAppointment(appointmentId) {
       AppointmentId: appointment.AppointmentId,
       Date: appointment.Date,
       Time: appointment.Time,
-      // הוסף כאן פרטים נוספים של הפגישה במידת הצורך
+
     },
     Patients: patients
   };
@@ -309,4 +309,15 @@ export async function getTherapistByEmail(email) {
   const [rows] = await pool.query('SELECT * FROM Therapists WHERE Email = ?', [email]);
   return rows[0];
 }
+
+/* פונקציות בכדי לבצע מחיקה נכונה של מטפל*/
+export async function transferPatients(oldTherapistID, newTherapistID) {
+  const [result] = await pool.query(`
+    UPDATE TherapistPatients tp
+    SET tp.TherapistID = ?
+    WHERE tp.TherapistID = ?
+  `, [newTherapistID, oldTherapistID]);
+  return result;
+}
+
 
