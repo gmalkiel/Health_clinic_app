@@ -1,28 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MeetingSummary = () => {
   const [patientName, setPatientName] = useState('');
   const [patientID, setPatientID] = useState('');
   const [meetingContent, setMeetingContent] = useState('');
   const [summary, setSummary] = useState('');
-  const [image, setImage] = useState(null);
- 
+  const [imagePath, setImagePath] = useState('');
+  const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
-    setImage(e.target.files[0]); // Store the uploaded image in state
+    setImagePath(e.target.files[0].path); // Set file path
   };
 
   async function getPatientId(idNumber) {
     try {
       const response = await fetch(`http://localhost:8080/patients/getId/${idNumber}`);
-  
       if (!response.ok) {
         throw new Error('Failed to fetch patient ID');
       }
-  
       const data = await response.json();
       return data.patientID;
-  
     } catch (error) {
       console.error('Error fetching patient ID:', error);
     }
@@ -30,22 +28,21 @@ const MeetingSummary = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Create a FormData object to handle the form submission
-    const formData = new FormData();
-    formData.append('SessionContent', meetingContent);
-    formData.append('SessionSummary', summary); 
-    if (image) {
-      formData.append('ArtworkImage', image); // Add the image to the form data
-    }
 
-    // Fetch the patient ID (using for internal logic only, not sending to server)
     const PatientId = await getPatientId(patientID);
-    
+
     try {
       const response = await fetch(`/session/${PatientId}`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          SessionContent: meetingContent,
+          SessionSummary: summary,
+          PatientId: PatientId,
+          ImagePath: imagePath, // Send image path
+        }),
       });
       if (response.ok) {
         console.log('Meeting summary submitted successfully');
@@ -77,7 +74,6 @@ const MeetingSummary = () => {
           onChange={(e) => setPatientID(e.target.value)}
         />
       </label>
-    
       <label>
         Meeting Content:
         <textarea

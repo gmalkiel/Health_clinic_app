@@ -1,9 +1,16 @@
 import express from "express";
 import cors from "cors";
 import * as db from "../Server/database.js";
+import fs from 'fs';
+import path from 'path';
+
+
 
 const app = express();
 
+
+// Middleware for handling JSON requests
+app.use(express.json());
 
 app.use(cors({
   origin: 'http://localhost:5173' // Adjust the port if needed
@@ -164,19 +171,24 @@ app.post("/therapist", async (req, res) => {
   }
 });
 
-app.post("/session/:PatientID", async (req, res) => {
-  const {SessionContent, SessionSummary, ArtworkImage } = req.body;
-  const { PatientID } = req.params
+app.post('/session/:PatientID', async (req, res) => {
+  const { PatientID } = req.params;
+  const { SessionContent, SessionSummary, ImagePath } = req.body;
 
   try {
-      const currentDate = new Date();
-      const newSession = await db.createSession(PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage );
-      res.status(201).send(newSession);
+    // Get current date
+    const currentDate = new Date();
+
+    // Insert data into database
+    const newSession = await db.createSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
+    res.status(200).send(newSession);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Error creating session');
+    console.error(error);
+    res.status(500).send('Error creating session');
   }
 });
+
+
 /*
 app.post('/addPatient', async (req, res) => {
     const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
