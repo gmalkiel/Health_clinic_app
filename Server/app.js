@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import * as db from "../Server/database.js";
+import fs from 'fs';
+import path from 'path';
+
+
 
 const app = express();
 app.use(express.json());
@@ -9,6 +13,9 @@ app.listen(8080, () => {
   console.log('Server is running on port 8080')
 })
 
+
+// Middleware for handling JSON requests
+app.use(express.json());
 app.use(express.static('client'));
 
 app.use(cors({
@@ -177,21 +184,61 @@ app.post("/therapist", async (req, res) => {
   }
 });
 
-app.post("/session/:PatientID", async (req, res) => {
-  const {SessionContent, SessionSummary, ArtworkImage } = req.body;
-  const { PatientID } = req.params
+app.post('/session/:PatientID', async (req, res) => {
+  const { PatientID } = req.params;
+  const { SessionContent, SessionSummary, ImagePath } = req.body;
 
   try {
-      const currentDate = new Date();
-      const newSession = await db.createSession(PatientID, currentDate, SessionContent, SessionSummary, ArtworkImage );
-      res.status(201).send(newSession);
+    // Get current date
+    const currentDate = new Date();
+
+    // Insert data into database
+    const newSession = await db.createSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
+    res.status(200).send(newSession);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Error creating session');
+    console.error(error);
+    res.status(500).send('Error creating session');
   }
 });
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
+            return res.status(400).send('Missing required fields');
+        }
+        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
+        res.status(201).send(newPatient);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+*/
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber) {
+            return res.status(400).send('Missing required fields');
+        }
 
-app.post('/Patient', async (req, res) => {
+        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
+        const newPatient = await createPatient(
+            TherapistID, Name, Age, IDNumber, 
+            req.body.MaritalStatus || null, 
+            req.body.SiblingPosition || null,
+            req.body.SiblingsNumber || null, 
+            req.body.EducationalInstitution || null, 
+            req.body.Medication || null, 
+            req.body.ReferralSource || null
+        );
+
+        res.status(201).send({ patientId: newPatient });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});*/
+app.post('/addPatient', async (req, res) => {
     if (!req.body) {
         return res.status(400).send('Request body is missing');
     }

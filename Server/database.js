@@ -291,13 +291,18 @@ export async function getSession(sessionId) {
 }
 
 export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage) {
+  const imagePath = path.resolve(ArtworkImagePath);
+  const imageData = fs.readFileSync(imagePath);
   const [result] = await pool.query(`
-  INSERT INTO Sessions (PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage)
-  VALUES (?, ?, ?, ?, ?)
-  `, [PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImage]);
-  const sessionId = result.insertId;
-  return getSession(sessionId);
+    INSERT INTO health_clinic.Sessions (sessionContent, sessionSummary, patientId, artworkImage, SessionDate)
+    VALUES (?, ?, ?, ?, ?)
+  `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+
+  const id = result.insertId;
+  return getSession(id); // Assuming you have a getSession function
 }
+
+
 
 export async function updateSession(id, SessionContent, SessionSummary, ArtworkImage) {
 
