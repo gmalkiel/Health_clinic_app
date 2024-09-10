@@ -3,7 +3,13 @@ import cors from "cors";
 import * as db from "../Server/database.js";
 
 const app = express();
+app.use(express.json());
+app.use(express.static('client'));
+app.listen(8080, () => {
+  console.log('Server is running on port 8080')
+})
 
+app.use(express.static('client'));
 
 app.use(cors({
   origin: 'http://localhost:5173' // Adjust the port if needed
@@ -177,44 +183,7 @@ app.post("/session/:PatientID", async (req, res) => {
       res.status(500).send('Error creating session');
   }
 });
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
-            return res.status(400).send('Missing required fields');
-        }
-        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
-        res.status(201).send(newPatient);
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
-*/
-/*
-app.post('/addPatient', async (req, res) => {
-    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber) {
-            return res.status(400).send('Missing required fields');
-        }
 
-        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
-        const newPatient = await createPatient(
-            TherapistID, Name, Age, IDNumber, 
-            req.body.MaritalStatus || null, 
-            req.body.SiblingPosition || null,
-            req.body.SiblingsNumber || null, 
-            req.body.EducationalInstitution || null, 
-            req.body.Medication || null, 
-            req.body.ReferralSource || null
-        );
-
-        res.status(201).send({ patientId: newPatient });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});*/
 app.post('/addPatient', async (req, res) => {
     if (!req.body) {
         return res.status(400).send('Request body is missing');
@@ -254,18 +223,7 @@ app.post('/patient', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-/*
-app.post("/Patient", async (req, res) => {
-  const { Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions} = req.body;
-  try {
-    
-      const patient = await db.createPatient(Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions);
-      res.status(200).send(patient);
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Error creating session');
-  }
-});*/
+
 /*מחיקת מטפל בדיקות */
 // Function to check for appointment conflicts
 app.post("/check-conflicts", async (req, res) => {
@@ -380,10 +338,55 @@ app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send('Something broke!')
 })
-app.use(express.json());
-app.use(express.static('client'));
-app.listen(8080, () => {
-  console.log('Server is running on port 8080')
-})
 
-app.use(express.static('client'));
+
+/*
+app.post("/Patient", async (req, res) => {
+  const { Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions} = req.body;
+  try {
+    
+      const patient = await db.createPatient(Name, Age, MaritalStatus, SiblingPosition, SiblingsNumber, IDNumber,EducationalInstitution,ReferralSource,  RemainingPayment, TherapistID,RemainingSessions);
+      res.status(200).send(patient);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error creating session');
+  }
+});*/
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber , MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource } = req.body;  // Required fields only
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber || !MaritalStatus || !SiblingPosition || !SiblingsNumber || !EducationalInstitution || !Medication || !ReferralSource) {
+            return res.status(400).send('Missing required fields');
+        }
+        const newPatient = await createPatient(TherapistID, Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource);
+        res.status(201).send(newPatient);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+*/
+/*
+app.post('/addPatient', async (req, res) => {
+    const { TherapistID, Name, Age, IDNumber } = req.body; // שדות חובה בלבד
+    try {
+        if (!TherapistID || !Name || !Age || !IDNumber) {
+            return res.status(400).send('Missing required fields');
+        }
+
+        // שליחה של כל השדות, גם אלה שיכולים להיות NULL
+        const newPatient = await createPatient(
+            TherapistID, Name, Age, IDNumber, 
+            req.body.MaritalStatus || null, 
+            req.body.SiblingPosition || null,
+            req.body.SiblingsNumber || null, 
+            req.body.EducationalInstitution || null, 
+            req.body.Medication || null, 
+            req.body.ReferralSource || null
+        );
+
+        res.status(201).send({ patientId: newPatient });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});*/
