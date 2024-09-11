@@ -236,31 +236,34 @@ app.post('/addPatient', async (req, res) => {
     }
 });*/
 app.post('/addPatient', async (req, res) => {
-    if (!req.body) {
-        return res.status(400).send('Request body is missing');
-    }
-    const { Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource, TherapistID } = req.body;
+  if (!req.body) {
+      return res.status(400).send('Request body is missing');
+  }
 
-    try {
-        if (!TherapistID || !Name || !Age || !IDNumber) {
-            return res.status(400).send('Missing required fields');
-        }
+  const { Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource, RemainingPayment, RemainingSessions, TherapistID } = req.body;
 
-        const newPatientId = await db.createPatient(
-            Name, Age, IDNumber, 
-            MaritalStatus || null, 
-            SiblingPosition || null, 
-            SiblingsNumber || null, 
-            EducationalInstitution || null, 
-            Medication || null, 
-            ReferralSource || null, 
-            TherapistID
-        );
+  try {
+      if (!TherapistID || !Name || !Age || !IDNumber) {
+          return res.status(400).send('Missing required fields');
+      }
 
-        res.status(201).send({ patientId: newPatientId });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
+      const newPatientId = await db.createPatient(
+          Name, Age, IDNumber, 
+          MaritalStatus || null, 
+          SiblingPosition || null, 
+          SiblingsNumber || null, 
+          EducationalInstitution || null, 
+          Medication || null, 
+          ReferralSource || null, 
+          TherapistID,
+          RemainingPayment, // Make sure RemainingPayment is passed
+          RemainingSessions // Make sure RemainingSessions is passed
+      );
+
+      res.status(200).send({ patientId: newPatientId });
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
 });
 
 /*מחיקת מטפל בדיקות */

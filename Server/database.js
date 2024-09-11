@@ -106,34 +106,64 @@ export async function getPatientsByTherapist(therapistId) {
   return rows;
 }
 
-
-export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null, TherapistID) {
+export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null, TherapistID, RemainingPayment, RemainingSessions, AppointmentTime = null) {
   const connection = await pool.getConnection();
-  await connection.beginTransaction();
 
   try {
-      const [result] = await connection.query(`
-          INSERT INTO Patients (Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource]);
+ 
 
-      const patientId = result.insertId;
+    const age = parseInt(Age);
+    const siblingPosition = parseInt(SiblingPosition);
+    const siblingsNumber = parseInt(SiblingsNumber);
+    const remainingPayment = parseFloat(RemainingPayment);
 
-      await connection.query(`
-          INSERT INTO TherapistPatients (TherapistID, PatientID)
-          VALUES (?, ?)
-      `, [TherapistID, patientId]); 
+   
+    const [result] = await connection.query(`
+      INSERT INTO Patients (
+        Name, 
+        Age, 
+        IDNumber, 
+        MaritalStatus, 
+        TreatmentGoals, 
+        SiblingPosition, 
+        SiblingsNumber, 
+        EducationalInstitution, 
+        Diagnoses, 
+        RiskLevel, 
+        Medication, 
+        ReferralSource, 
+        RemainingSessions, 
+        RemainingPayment, 
+        AppointmentTime
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [Name, age, IDNumber, MaritalStatus, null, siblingPosition, siblingsNumber, EducationalInstitution, null, null, Medication, ReferralSource, RemainingSessions, remainingPayment, AppointmentTime]);
 
-      await connection.commit();
+   
 
-      return patientId;
+    const patientId = result.insertId;
+
+
+
+  
+    await connection.query(`
+      INSERT INTO TherapistPatients (TherapistID, PatientID)
+      VALUES (?, ?)
+    `, [TherapistID, patientId]);
+
+
+
+    return getPatient(patientId);
   } catch (error) {
-      await connection.rollback();
-      throw error;
+    console.error('Error:', error.message);
+    throw error;
   } finally {
-      connection.release();
+    connection.release();
+   
   }
 }
+
+
+
 
 export async function updatePatient(patientId, patientData) {
   const updates = [];

@@ -32,42 +32,55 @@ const AddPatient = () => {
       [e.target.name]: e.target.value,
     });
   };
+  const checkPatientExists = async (IDNumber) => {
+    try {
+        const response = await fetch(`http://localhost:8080/patients/check/${IDNumber}`);
+        return await response.json();
+    } catch (error) {
+        console.error("Error checking patient:", error);
+        throw error;
+    }
+};
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    fetch(`http://localhost:8080/patients/check/${formData.IDNumber}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.exists) {
-          setError("Patient already exists in the system.");
-        } else {
-          const patientData = {
-            ...formData,
-            RemainingPayment: -formData.Payment,
-            RemainingSessions: 4,
-          };
-  
-          fetch("http://localhost:8080/patient", {
+const addPatient = async (patientData) => {
+    try {
+        const response = await fetch("http://localhost:8080/addPatient", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(patientData),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("Patient added successfully:", data);
-              setError(""); 
-            })
-            .catch((error) => {
-              console.error("Error adding patient:", error);
-              setError("Failed to add patient.");
-            });
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Error adding patient:", error);
+       throw error;
+       
+    }
+};
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+        const data = await checkPatientExists(formData.IDNumber);
+        if (data.exists) {
+            setError("Patient already exists in the system.");
+        } else {
+            const patientData = {
+                ...formData,
+                RemainingPayment: -formData.Payment,
+                RemainingSessions: 4,
+            };
+            const result = await addPatient(patientData);
+            console.log("Patient added successfully:", result);
+            //setError("");
         }
-      })
-      .catch((error) => console.error("Error checking patient:", error));
-  };
+    } catch (error) {
+        setError("Failed to add patient.");
+    }
+};
+
   
   return (
     <div className="add-patient-container">
