@@ -14,7 +14,17 @@ const pool = mysql.createPool({
   user:'root',
   password: 'galit2944',
   database: 'health_clinic'
-}).promise()
+}).promise() 
+
+//maneger func
+export async function getManger(id) {
+  const [rows] = await pool.query(`
+  SELECT * 
+  FROM Managers
+  WHERE IDNumber = ?
+  `, [id])
+  return rows[0]
+}
 
 //Therapists functions
 

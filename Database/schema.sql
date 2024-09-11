@@ -93,8 +93,8 @@ CREATE TABLE Messages (
 
 CREATE TABLE Managers (
     ManagerID INTEGER PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    IDNumber VARCHAR(20) NOT NULL
+    Name VARCHAR(255) NOT NULL,   --userName
+    IDNumber VARCHAR(20) NOT NULL --password
 );
 
 

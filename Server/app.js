@@ -19,6 +19,11 @@ app.use(cors({
   origin: 'http://localhost:5173' // Adjust the port if needed
 }));
 /*GET */
+app.get("/manager/:id", async (req, res) => {
+  const id = req.params.id;
+  const manager = await db.getManger(id);
+  res.send(manager);
+});
 app.get("/therapists", async (req, res) => {
   const therapists = await db.getAllTherapists();
   res.send(therapists);

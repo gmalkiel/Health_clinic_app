@@ -27,17 +27,21 @@ const Login = () => {
           }
         else{
           //במידה ונרצה כניסת מנהל נחפש בטבלה המתאימה
-            response = await fetch(`http://localhost:8080/manager/${username}`);
+            response = await fetch(`http://localhost:8080/manager/${password}`);
         }
 
         if (response.ok) {
            const user = await response.json();
            console.log(user);
            
-           if (password === user.T_Password) {
-               //navigate('/home');
-               navigate(`/AddRestOfPatient/${3}`);
-           } else {
+           if (!manger && password === user.T_Password) {         
+               navigate(`/home/therapist/${username}`);
+
+           } 
+          else if(manger){
+            navigate(`/home/admin/${username}`);
+          }
+           else {
                setError('Invalid password');
            }
         } else {
@@ -54,8 +58,6 @@ const Login = () => {
   return (
     <>
     <div className='login-container'>
-      
-
       <h2>התחברות למערכת</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
@@ -85,7 +87,7 @@ const Login = () => {
     onClick={(e) => {
       e.preventDefault();
       setManager(!manger); 
-    }}אני 
+    }}
     className={manger ? 'manager-active' : 'manager-inactive'} // מיישם את הסגנון בהתאם למצב
   >
     {manger ? 'כניסה כמטפל' : 'כניסה כמנהל'}

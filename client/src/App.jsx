@@ -11,7 +11,6 @@ import AddTherapist from '../src/components/AddTherapist';
 import TherapistDetails from '../src/components/TherapistDetails';
 import AddPatient from '../src/components/AddPatient';
 import AddRestOfPatient from '../src/components/AddRestOfPatient';
-
 import MeetingSummary  from '../src/components/MeetingSummary';
 
 function App() {
@@ -20,7 +19,7 @@ function App() {
        <Header /> {/* Header will be displayed on all pages */}
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home/:IsManager/:T_User_Name" element={<Home />} />
         <Route path="/meetingSummary" element={<MeetingSummary />} />
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />
