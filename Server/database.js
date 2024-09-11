@@ -307,7 +307,7 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
   return getSession(id); // Assuming you have a getSession function
 }
 
-export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+/*export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
   try {
     const imagePath = path.resolve(ArtworkImagePath);
     const imageData = fs.readFileSync(imagePath); // Read the image data as binary
@@ -320,6 +320,80 @@ export async function createNewSession(PatientID, SessionDate, SessionContent, S
     return getSession(id); // Assuming you have a getSession function
   } catch (error) {
     console.error('Error in createSession:', error.message);
+    throw error;
+  }
+}*/
+
+export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
+  try {
+    const imagePath = path.resolve(ArtworkImagePath);
+    const imageData = fs.readFileSync(imagePath); // Read the image data as binary
+    const [result] = await pool.query(`
+      INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
+      VALUES (?, ?, ?, ?, ?)
+    `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+
+    const sessionId = result.insertId;
+
+    // Step 2: Get the therapist for the patient
+    const [therapistRow] = await pool.query(`
+      SELECT TherapistID
+      FROM TherapistPatients
+      WHERE PatientID = ?
+    `, [PatientID]);
+
+    if (therapistRow.length === 0) {
+      throw new Error('No therapist found for the patient');
+    }
+
+    const therapistID = therapistRow[0].TherapistID;
+
+    // Step 3: Get the session price for the therapist
+    const [therapist] = await pool.query(`
+      SELECT SessionPrice
+      FROM Therapists
+      WHERE TherapistID = ?
+    `, [therapistID]);
+
+    if (therapist.length === 0) {
+      throw new Error('No session price found for the therapist');
+    }
+
+    const sessionPrice = therapist[0].SessionPrice;
+
+    // Step 4: Update the patient's remaining sessions and balance
+    await pool.query(`
+      UPDATE Patients
+      SET remainingSessions = remainingSessions - 1,
+          remainingPayment = remainingPayment + ?
+      WHERE PatientID = ?
+    `, [sessionPrice, PatientID]);
+
+    // Step 5: Check if the patient's remainingPayment is greater than 0
+    const [patient] = await pool.query(`
+      SELECT Name, remainingPayment
+      FROM Patients
+      WHERE PatientID = ?
+    `, [PatientID]);
+
+    const patientName = patient[0].Name;
+    const remainingPayment = patient[0].remainingPayment;
+
+    if (remainingPayment > 0) {
+      const paymentAlertMessage = `התראת תשלום למטופל ${patientName} (ID: ${PatientID}) - יתרת תשלום: ${remainingPayment} ש"ח.`;
+
+      // Step 6: Insert the payment alert message for the therapist
+      await pool.query(`
+        INSERT INTO Messages (TherapistID, Content)
+        VALUES (?, ?)
+      `, [therapistID, paymentAlertMessage]);
+    }
+
+    // Step 7: Optionally, return the new session details
+    return getSession(sessionId); // Assuming you have a getSession function to retrieve the session
+
+  } catch (error) {
+    console.error('Error in createNewSession:', error.message);
     throw error;
   }
 }

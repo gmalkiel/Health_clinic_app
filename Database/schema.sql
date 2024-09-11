@@ -49,7 +49,8 @@ CREATE TABLE Therapists (
     T_Password VARCHAR(255),
     Gender VARCHAR(255),
     Adress VARCHAR(255),
-    Phone VARCHAR(20)
+    Phone VARCHAR(20),
+    SessionPrice DECIMAL(10, 2)
 );
 
 CREATE TABLE Appointments (
