@@ -1,4 +1,4 @@
-import * as db from '../database.js';
+import db from '../databasemy.js';
 
 // Retrieve all appointments
 export const getAllAppointments = async () => {

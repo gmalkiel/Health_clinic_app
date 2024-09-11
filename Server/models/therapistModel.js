@@ -1,4 +1,4 @@
-import * as db from '../database.js';
+import db from '../database.js';
 
 // Retrieve all therapists
 export const getAllTherapists = async () => {

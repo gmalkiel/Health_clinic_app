@@ -28,7 +28,7 @@ export const getAppointmentById = async (req, res) => {
 export const getAppointmentsByTherapist = async (req, res) => {
   const { id } = req.params;
   try {
-    const appointments = await appointmentModel.getAppointmentsByTherapist(id);
+    const appointments = await appointmentModel.getTherapistAppointments(id);
     res.send(appointments);
   } catch (error) {
     console.error(error);

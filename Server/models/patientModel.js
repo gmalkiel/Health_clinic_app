@@ -1,5 +1,5 @@
 // patientModel.js
-import db from '../database.js';
+import db from '../databasemy.js';
 
 // Retrieve all patients
 export const getAllPatients = async () => {

@@ -6,7 +6,7 @@ const router = express.Router();
 // GET requests
 router.get('/', appointmentController.getAllAppointments);
 router.get('/:id', appointmentController.getAppointmentById);
-router.get('/therapist/:id', appointmentController.getAppointmentsByTherapist);
+router.get('/therapist/:id', appointmentController.getAppointmentsByTherapist);//work
 
 // POST requests
 router.post('/', appointmentController.createAppointment);

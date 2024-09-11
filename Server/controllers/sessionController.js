@@ -1,4 +1,4 @@
-import * as db from '../database.js';
+import * as db from '../databasemy.js';
 
 export const getSessionById = async (req, res) => {
     const { id } = req.params;

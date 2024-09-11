@@ -1,4 +1,4 @@
-import * as db from '../database.js';
+import db from '../database.js';
 
 // Retrieve session by ID
 export const getSession = async (id) => {

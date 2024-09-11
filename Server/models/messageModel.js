@@ -1,4 +1,4 @@
-import * as db from '../database.js';
+import db from '../databasemy.js';
 
 // Retrieve messages for a specific therapist
 export const getMessagesForTherapist = async (therapistID) => {
