@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../css/AddPatient.css"; // Import the CSS file for styling
-
+import { useNavigate } from 'react-router-dom';
 const AddPatient = () => {
   const [therapists, setTherapists] = useState([]);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Name: "",
     Age: "",
@@ -74,6 +75,7 @@ const handleSubmit = async (e) => {
             };
             const result = await addPatient(patientData);
             console.log("Patient added successfully:", result);
+            navigate('/home/admin/Yosi')
             //setError("");
         }
     } catch (error) {

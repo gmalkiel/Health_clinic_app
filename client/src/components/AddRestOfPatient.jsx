@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../css/AddRestOfPatient.css'; // Import the CSS file
 
-
 const AddRestOfPatient = () => {
     const { PatientID } = useParams(); // Get PatientID from the URL
     const [patient, setPatient] = useState(null);
@@ -24,24 +23,28 @@ const AddRestOfPatient = () => {
                 }
                 const data = await response.json();
                 setPatient(data);
+    
+                // Format the date for the datetime-local input
+                const formattedDate = data.AppointmentTime ? new Date(data.AppointmentTime).toISOString().slice(0, 16) : "";
+    
                 setFormData({
                     TreatmentGoals: data.TreatmentGoals || "",
                     Diagnoses: data.Diagnoses || "",
                     RiskLevel: data.RiskLevel || "",
                     Medication: data.Medication || "",
-                    AppointmentTime: data.AppointmentTime || ""
+                    AppointmentTime: formattedDate
                 });
             } catch (error) {
                 setError('Error loading patient details');
                 console.error('Error fetching patient:', error);
             }
         };
-
+    
         if (PatientID) {
             fetchPatientDetails();
         }
     }, [PatientID]);
-
+    
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -49,25 +52,29 @@ const AddRestOfPatient = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        fetch(`http://localhost:8080/patient/${PatientID}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-        })
-        .then((response) => response.json())
-        .then((data) => {
+       
+        // Convert the date and time to a VARCHAR format (e.g., "YYYY-MM-DD HH:MM:SS")
+        //const formattedAppointmentTime = new Date(formData.AppointmentTime).toISOString().slice(0, 19).replace('T', ' ');
+
+        try {
+            const response = await fetch(`http://localhost:8080/patient/${PatientID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ ...formData}),
+            });
+            if (!response.ok) throw new Error('Failed to update patient');
+            
+            const data = await response.json();
             console.log("Patient updated successfully:", data);
-            setError("");
-        })
-        .catch((error) => {
+            debugger;
+        } catch (error) {
             console.error("Error updating patient:", error);
             setError("Failed to update patient.");
-        });
+        }
     };
 
     if (error) return <div className="error">{error}</div>;
@@ -159,7 +166,7 @@ const AddRestOfPatient = () => {
                 <div className="form-group">
                     <label htmlFor="AppointmentTime">Appointment Time:</label>
                     <input
-                        type="text"
+                        type="datetime-local"
                         id="AppointmentTime"
                         name="AppointmentTime"
                         value={formData.AppointmentTime}
@@ -171,5 +178,4 @@ const AddRestOfPatient = () => {
         </div>
     );
 };
-
 export default AddRestOfPatient;

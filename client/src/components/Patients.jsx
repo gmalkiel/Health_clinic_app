@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa'; // human icon
 import '../css/Patients.css'; // for styling
 
-
-const PatientList = () => {
+const Patients = () => {
   const { TherapistID } = useParams(); // Get TherapistID from the URL
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -12,39 +11,38 @@ const PatientList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('');
   const [ageFilter, setAgeFilter] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchPatients = async () => {
-      if(!TherapistID){
-          try {
-            const response = await fetch('http://localhost:8080/patients');
-            if (!response.ok) throw new Error('נכשלה בקבלת נתונים על מטופלים');
-            const data = await response.json();
-            setPatients(data);
-            setFilteredPatients(data);
-          } catch (error) {
-            console.error('שגיאה בקבלת המטופלים:', error);
-            setError('נכשלה טעינת המטופלים. אנא נסה שוב.');
-          }
+      if (!TherapistID) {
+        try {
+          const response = await fetch('http://localhost:8080/patients');
+          if (!response.ok) throw new Error('Failed to fetch patients');
+          const data = await response.json();
+          setPatients(data);
+          setFilteredPatients(data);
+        } catch (error) {
+          console.error('Error fetching patients:', error);
+          setError('Failed to load patients. Please try again.');
         }
-        else{
-          try {
-            const response = await fetch(`http://localhost:8080/therapist/${TherapistID}/patients`);
-            if (!response.ok) throw new Error('נכשלה בקבלת נתונים על מטופלים');
-            const data = await response.json();
-            setPatients(data);
-            setFilteredPatients(data);
-          } catch (error) {
-            console.error('שגיאה בקבלת המטופלים:', error);
-            setError('נכשלה טעינת המטופלים. אנא נסה שוב.');
-          }
+      } else {
+        try {
+          const response = await fetch(`http://localhost:8080/therapist/${TherapistID}/patients`);
+          if (!response.ok) throw new Error('Failed to fetch patients');
+          const data = await response.json();
+          setPatients(data);
+          setFilteredPatients(data);
+        } catch (error) {
+          console.error('Error fetching patients:', error);
+          setError('Failed to load patients. Please try again.');
         }
-         };
+      }
+    };
     fetchPatients();
-  }, []);
+  }, [TherapistID]);
 
   useEffect(() => {
-    // סינון לפי גיל אם נבחר פילטר
     let filtered = patients.filter((patient) =>
       patient.Name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -53,7 +51,6 @@ const PatientList = () => {
       filtered = filtered.filter((patient) => patient.Age === parseInt(ageFilter, 10));
     }
 
-    // מיון לפי השדה שנבחר
     if (sortField) {
       filtered.sort((a, b) => {
         if (a[sortField] < b[sortField]) return -1;
@@ -65,47 +62,58 @@ const PatientList = () => {
     setFilteredPatients(filtered);
   }, [searchTerm, sortField, ageFilter, patients]);
 
+  const handleRowClick = (patientId) => {
+    
+    const PatientID = patients.at(patientId).PatientID;
+    // Navigate to the patient details page
+    navigate(`/PatientDetails/${PatientID}`);
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
     <div className="patient-list-container">
-      {/* אזור החיפוש, הסינון והמיון */}
+      {/* Search, filter, and sort controls */}
       <div className="filters-container">
         <input
           type="text"
-          placeholder="חפש לפי שם..."
+          placeholder="Search by name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <input
           type="number"
-          placeholder="סנן לפי גיל..."
+          placeholder="Filter by age..."
           value={ageFilter}
           onChange={(e) => setAgeFilter(e.target.value)}
         />
         <select onChange={(e) => setSortField(e.target.value)}>
-          <option value="">מיין לפי...</option>
-          <option value="Name">שם</option>
-          <option value="Age">גיל</option>
-          <option value="IDNumber">ת.ז</option>
+          <option value="">Sort by...</option>
+          <option value="Name">Name</option>
+          <option value="Age">Age</option>
+          <option value="IDNumber">ID Number</option>
         </select>
       </div>
 
-      {/* רשימת המטופלים */}
+      {/* Patient list */}
       {filteredPatients.map((patient) => (
-        <div key={patient.PatientID} className="patient-row">
+        <div
+          key={patient.PatientID}
+          className="patient-row"
+          onClick={() => handleRowClick(patient.PatientID)}
+        >
           <FaUser className="user-icon" />
           <span><strong>שם:</strong> {patient.Name}</span>
           <span><strong>ת.ז:</strong> {patient.IDNumber}</span>
           <span><strong>גיל:</strong> {patient.Age}</span>
           <span><strong>טלפון:</strong> {patient.Phone}</span>
-          <span><strong>אימייל:</strong> {patient.Mail}</span>
+          <span><strong>מייל:</strong> {patient.Mail}</span>
         </div>
       ))}
     </div>
   );
 };
 
-export default PatientList;
+export default Patients;

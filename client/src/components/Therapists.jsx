@@ -4,6 +4,7 @@ import '../css/Therapists.css'; // Import the CSS file
 import { useNavigate } from 'react-router-dom';
 
 const Therapists = () => {
+
     const [therapists, setTherapists] = useState([]);
     const [filteredTherapists, setFilteredTherapists] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');

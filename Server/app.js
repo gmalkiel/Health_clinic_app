@@ -220,34 +220,39 @@ app.post('/addsession/:PatientID', async (req, res) => {
 
 app.post('/addPatient', async (req, res) => {
   if (!req.body) {
-      return res.status(400).send('Request body is missing');
+    return res.status(400).send('Request body is missing');
   }
 
   const { Name, Age, IDNumber, MaritalStatus, SiblingPosition, SiblingsNumber, EducationalInstitution, Medication, ReferralSource, RemainingPayment, RemainingSessions, TherapistID } = req.body;
 
   try {
-      if (!TherapistID || !Name || !Age || !IDNumber) {
-          return res.status(400).send('Missing required fields');
-      }
+    // בדיקה האם כל השדות החיוניים קיימים
+    if (!TherapistID || !Name || !Age || !IDNumber) {
+      return res.status(400).send('Missing required fields');
+    }
 
-      const newPatientId = await db.createPatient(
-          Name, Age, IDNumber, 
-          MaritalStatus || null, 
-          SiblingPosition || null, 
-          SiblingsNumber || null, 
-          EducationalInstitution || null, 
-          Medication || null, 
-          ReferralSource || null, 
-          TherapistID,
-          RemainingPayment, // Make sure RemainingPayment is passed
-          RemainingSessions // Make sure RemainingSessions is passed
-      );
+    // המרת RemainingPayment ו- RemainingSessions לערכים נדרשים (אם לא סופקו, יהיו NULL)
+    const newPatientId = await db.createPatient(
+      Name,
+      Age,
+      IDNumber,
+      MaritalStatus || null,
+      SiblingPosition || null,
+      SiblingsNumber || null,
+      EducationalInstitution || null,
+      Medication || null,
+      ReferralSource || null,
+      TherapistID,
+      RemainingPayment !== undefined ? RemainingPayment : null, // טיפול במקרים בהם RemainingPayment אינו מוגדר
+      RemainingSessions !== undefined ? RemainingSessions : null // טיפול במקרים בהם RemainingSessions אינו מוגדר
+    );
 
-      res.status(200).send({ patientId: newPatientId });
+    res.status(200).send({ patientId: newPatientId });
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 });
+
 
 /*מחיקת מטפל בדיקות */
 // Function to check for appointment conflicts

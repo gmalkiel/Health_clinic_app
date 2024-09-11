@@ -122,63 +122,52 @@ export async function getPatientsByTherapist(therapistId) {
   return rows;
 }
 
-export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null, TherapistID, RemainingPayment, RemainingSessions, AppointmentTime = null) {
+export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, SiblingPosition = null, SiblingsNumber = null, EducationalInstitution = null, Medication = null, ReferralSource = null, TherapistID, RemainingPayment = null, RemainingSessions = null, AppointmentTime = null) {
   const connection = await pool.getConnection();
 
   try {
- 
-
+    // המרת הערכים למספרים
     const age = parseInt(Age);
-    const siblingPosition = parseInt(SiblingPosition);
-    const siblingsNumber = parseInt(SiblingsNumber);
-    const remainingPayment = parseFloat(RemainingPayment);
+    const siblingPosition = SiblingPosition !== null ? parseInt(SiblingPosition) : null;
+    const siblingsNumber = SiblingsNumber !== null ? parseInt(SiblingsNumber) : null;
+    const remainingPayment = RemainingPayment !== null ? parseFloat(RemainingPayment) : null;
 
-   
+    // הכנסת המטופל לטבלת Patients
     const [result] = await connection.query(`
       INSERT INTO Patients (
         Name, 
         Age, 
         IDNumber, 
         MaritalStatus, 
-        TreatmentGoals, 
         SiblingPosition, 
         SiblingsNumber, 
         EducationalInstitution, 
-        Diagnoses, 
-        RiskLevel, 
         Medication, 
         ReferralSource, 
         RemainingSessions, 
         RemainingPayment, 
         AppointmentTime
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [Name, age, IDNumber, MaritalStatus, null, siblingPosition, siblingsNumber, EducationalInstitution, null, null, Medication, ReferralSource, RemainingSessions, remainingPayment, AppointmentTime]);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [Name, age, IDNumber, MaritalStatus, siblingPosition, siblingsNumber, EducationalInstitution, Medication, ReferralSource, RemainingSessions, remainingPayment, AppointmentTime]);
 
-   
-
+    // שמירת ה־PatientID שנוצר
     const patientId = result.insertId;
 
-
-
-  
+    // הוספת רשומה לטבלת TherapistPatients לקשר בין מטפל למטופל
     await connection.query(`
       INSERT INTO TherapistPatients (TherapistID, PatientID)
       VALUES (?, ?)
     `, [TherapistID, patientId]);
 
-
-
+    // החזרת המטופל שהתווסף
     return getPatient(patientId);
   } catch (error) {
     console.error('Error:', error.message);
     throw error;
   } finally {
     connection.release();
-   
   }
 }
-
-
 
 
 export async function updatePatient(patientId, patientData) {
@@ -287,7 +276,6 @@ export async function updatePatient(patientId, patientData) {
   }
 
 }
-
 
 export async function isPatientExists(idNumber) {
   try {
