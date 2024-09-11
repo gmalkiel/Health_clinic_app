@@ -204,9 +204,6 @@ export async function updatePatient(patientId, patientData) {
               SET ${updates.join(', ')}
               WHERE PatientID = ?
           `;
-          console.log('Executing query:', query);
-          console.log('With values:', values);
-
           await pool.query(query, values);
       } catch (error) {
           console.error('Error updating patient:', error.message);
@@ -217,7 +214,7 @@ export async function updatePatient(patientId, patientData) {
   // If AppointmentTime is updated, create a new Appointment
   if (appointmentTimeUpdated) {
     let therapistID;
-
+    debugger;
     try {
         // Retrieve the TherapistID associated with the patient
         const query = `
@@ -239,9 +236,10 @@ export async function updatePatient(patientId, patientData) {
         console.error('Error retrieving therapistID:', error.message);
         throw error;
     }
-
-    const [day, time] = patientData.AppointmentTime.split(' ');
-
+    debugger;
+    const [day, time] = patientData.AppointmentTime.split('T');
+    // הוספת שניות (MySQL דורש את פורמט 'HH:MM:SS' עבור TIME)
+    const timeWithSeconds = `${time}:00`;
       try {
           // Check if an appointment with the same day and time already exists for the therapist
           const checkQuery = `
@@ -252,9 +250,10 @@ export async function updatePatient(patientId, patientData) {
               AND AppointmentsTime = ?
           `;
           console.log('Executing query:', checkQuery);
-          console.log('With values:', [therapistID, day, time]);
-
-          const [[result]] = await pool.query(checkQuery, [therapistID, day, time]);
+          console.log('With values:', [therapistID, day, timeWithSeconds]);
+          debugger;
+          therapistID = parseInt(therapistID, 10);
+          const [[result]] = await pool.query(checkQuery, [therapistID, day, timeWithSeconds]);
 
           if (result.count > 0) {
               throw new Error('An appointment with the same day and time already exists for this therapist');
@@ -266,9 +265,9 @@ export async function updatePatient(patientId, patientData) {
               VALUES (?, ?, ?, ?, ?)
           `;
           console.log('Executing query:', insertQuery);
-          console.log('With values:', [therapistID, patientIdInt, day, time, '']); // Add Location if needed
+          console.log('With values:', [therapistID, patientIdInt, day, timeWithSeconds, '']); // Add Location if needed
 
-          await pool.query(insertQuery, [therapistID, patientIdInt, day, time, '']);
+          await pool.query(insertQuery, [therapistID, patientIdInt, day, timeWithSeconds, '']);
       } catch (error) {
           console.error('Error processing appointment:', error.message);
           throw error;
