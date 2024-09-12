@@ -5,7 +5,6 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// יצירת __dirname בסביבת ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -275,6 +274,7 @@ app.post('/session/:PatientID', async (req, res) => {
   }
 });
 */
+/*
 app.post('/session/:PatientID', async (req, res) => {
   const { PatientID } = req.params;
   const { SessionContent, SessionSummary, ImagePath } = req.body;
@@ -288,7 +288,7 @@ app.post('/session/:PatientID', async (req, res) => {
     res.status(500).send('Error creating session');
   }
 });
-
+*/
 
 app.post('/addPatient', async (req, res) => {
   if (!req.body) {
