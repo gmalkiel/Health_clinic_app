@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../css/MeetingSummary.css'; // Import the CSS file for styling
 
 const MeetingSummary = () => {
   const [patientName, setPatientName] = useState('');
@@ -7,10 +8,21 @@ const MeetingSummary = () => {
   const [meetingContent, setMeetingContent] = useState('');
   const [summary, setSummary] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
-    setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    setImageFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
   };
 
   async function getPatientId(idNumber) {
@@ -28,7 +40,6 @@ const MeetingSummary = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const PatientId = await getPatientId(patientID);
     const formData = new FormData();
     formData.append('SessionContent', meetingContent);
@@ -47,7 +58,7 @@ const MeetingSummary = () => {
         console.log('Meeting summary submitted successfully');
         const res = await fetch(`http://localhost:8080/therapist/${PatientId}/therapist`);
         const data = await res.json();
-        console.log("Patient updated successfully:", data);
+        console.log('Patient updated successfully:', data);
         navigate(`/home/therapist/${data.UserName}`);
       } else {
         console.log('Error submitting the meeting summary');
@@ -58,48 +69,61 @@ const MeetingSummary = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Patient Name:
-        <input
-          type="text"
-          value={patientName}
-          onChange={(e) => setPatientName(e.target.value)}
-        />
-      </label>
-      <br />
-      <label>
-        Patient ID:
-        <input
-          type="text"
-          value={patientID}
-          onChange={(e) => setPatientID(e.target.value)}
-        />
-      </label>
-      <br />
-      <label>
-        Meeting Content:
-        <textarea
-          value={meetingContent}
-          onChange={(e) => setMeetingContent(e.target.value)}
-        />
-      </label>
-      <br />
-      <label>
-        Summary (short):
-        <textarea
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-        />
-      </label>
-      <br />
-      <label>
-        Upload Image:
-        <input type="file" onChange={handleImageUpload} />
-      </label>
-      <br />
-      <button type="submit">Submit Summary</button>
-    </form>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className="meeting-summary-form">
+        <h2>סיכום פגישה</h2>
+        <label>
+          Name:
+          <input
+            type="text"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          ID Number:
+          <input
+            type="text"
+            value={patientID}
+            onChange={(e) => setPatientID(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Meeting Content:
+          <textarea
+            value={meetingContent}
+            onChange={(e) => setMeetingContent(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Summary:
+          <textarea
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            required
+          />
+        </label>
+        <label className="image-upload-label">
+          Upload Image:
+          <div className="image-upload-container">
+            <input
+              type="file"
+              onChange={handleImageUpload}
+              className="image-input"
+            />
+            {imagePreview ? (
+              <img src={imagePreview} alt="Preview" className="image-preview" />
+            ) : (
+              <div className="image-placeholder">+</div>
+            )}
+          </div>
+        </label>
+        <button type="submit" className="submit-button">Submit Summary</button>
+      </form>
+    </div>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../css/Login.css';      
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { useUser } from '../components/UserContext'; 
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -11,6 +11,7 @@ const Login = () => {
   const[manger,setManager] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUser } = useUser();
   useEffect(() => {
     if (location.state && location.state.manager !== undefined) {
       setManager(location.state.manager);
@@ -27,18 +28,22 @@ const Login = () => {
           }
         else{
           //במידה ונרצה כניסת מנהל נחפש בטבלה המתאימה
-            response = await fetch(`http://localhost:8080/manager/${password}`);
+            response = await fetch(`http://localhost:8080/manager_/${password}`);
         }
 
         if (response.ok) {
            const user = await response.json();
            console.log(user);
            
-           if (!manger && password === user.T_Password) {         
-               navigate(`/home/therapist/${username}`);
+           if (!manger && password === user.T_Password) {    
+            setUser({ username, manger });     
+            navigate(`/home/therapist/${username}`);
+          
+
 
            } 
           else if(manger){
+            setUser({ username, manger });
             navigate(`/home/admin/${username}`);
           }
            else {

@@ -66,6 +66,11 @@ app.get("/manager/:id", async (req, res) => {
   const manager = await db.getManger(id);
   res.send(manager);
 });
+app.get("/manager_/:id", async (req, res) => {
+  const id = req.params.id;
+  const manager = await db.getManger_(id);
+  res.send(manager);
+});
 app.get("/managers", async (req, res) => {
   const manager = await db.getMangers();
   res.send(manager);

@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../src/components/Home';
 import Login from '../src/components/login';
-import Header from '../src/components/header';
+import Header from '../src/components/Header';
 import Therapists from '/src/components/Therapists';
 import Patients from '../src/components/Patients';
 import AddTherapist from '../src/components/AddTherapist';
@@ -15,14 +14,17 @@ import MeetingSummary  from '../src/components/MeetingSummary';
 import PatientDetails from '../src/components/PatientDetails';
 import Navigation from '../src/components/Navigation';
 import Replace_Manager from './components/Replace_Manager';
+import Layout from '../src/components/Layout';
+import { UserProvider } from '../src/components/UserContext';
 function App() {
   return (
+    <UserProvider> 
     <Router>
-       <Header /> {/* Header will be displayed on all pages */}
+       <Layout /> {/* Header will be displayed on all pages */}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/home/:IsManager/:T_User_Name" element={<Home />} />
-        <Route path="/replaceManagernager" element={<Replace_Manager/>} />
+        <Route path="/replaceManager" element={<Replace_Manager/>} />
         <Route path="/meetingSummary" element={<MeetingSummary />} />
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />
@@ -39,6 +41,7 @@ function App() {
         <Route path="/delete-therapist/:id" element={<DeleteTherapist />} />*/}
       </Routes>
     </Router>
+    </UserProvider>
   );
 }
 

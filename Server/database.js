@@ -25,6 +25,14 @@ export async function getManger(id) {
   `, [id])
   return rows[0]
 }
+export async function getManger_(Id) {
+  const [rows] = await pool.query(`
+  SELECT * 
+  FROM Managers
+  WHERE IDNumber = ?
+  `, [Id])
+  return rows[0]
+}
 export async function getMangers(){
   const [rows] = await pool.query(`
     SELECT * 
@@ -198,7 +206,8 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
       INSERT INTO TherapistPatients (TherapistID, PatientID)
       VALUES (?, ?)
     `, [TherapistID, patientId]);
-
+    let message =  `תור למטופל: ${Name}, עם מספר תעודת זהות: ${IDNumber}.`
+    addMessage(TherapistID,message);
     // החזרת המטופל שהתווסף
     return getPatient(patientId);
   } catch (error) {
@@ -697,13 +706,14 @@ export async function getTherapistByEmail(email) {
   return rows[0];
 }
 
-/* פונקציות בכדי לבצע מחיקה נכונה של מטפל*/
+/* יש להוסיף הודעה למטפל שאליו הועברו המטופלים בה כתוב קבע פגישות עבור המטופלים החדשים במידת הצורך פונקציות בכדי לבצע מחיקה נכונה של מטפל*/
 export async function transferPatients(oldTherapistID, newTherapistID) {
   const [result] = await pool.query(`
     UPDATE TherapistPatients tp
     SET tp.TherapistID = ?
     WHERE tp.TherapistID = ?
   `, [newTherapistID, oldTherapistID]);
+  addMessage(newTherapistID,"הוא עברו אליך מטופלים חדשים עליך לעדכן פגישות בהתאם")
   return result;
 }
 

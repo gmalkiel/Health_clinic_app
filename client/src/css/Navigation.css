@@ -1,11 +1,11 @@
 .side-navigation {
-  width: 250px;
+  width: 10%;
   height: 100vh;
   position: fixed;
   top: 0;
   right: 0;
   background-color: #f4f4f4;
-  padding-top: 60px; /* השארת מקום לכותרת */
+  padding-top: 15%; /* השארת מקום לכותרת */
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   text-align: right;
 }
