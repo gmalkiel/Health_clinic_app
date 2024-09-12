@@ -13,6 +13,7 @@ import AddPatient from '../src/components/AddPatient';
 import AddRestOfPatient from '../src/components/AddRestOfPatient';
 import MeetingSummary  from '../src/components/MeetingSummary';
 import PatientDetails from '../src/components/PatientDetails';
+import Navigation from '../src/components/Navigation';
 import Replace_Manager from './components/Replace_Manager';
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/addPatient" element={<AddPatient />} />
         <Route path="/PatientDetails/:patientID" element={<PatientDetails />} />
         <Route path="/addRestOfPatient/:PatientID" element={<AddRestOfPatient />} />
+        <Route path="/navigation" element={<Navigation />} />
 
         {/*טיפול במצב מחיקה של מטפל מה לעשות עם מטופלים שקשורים אליו האם למחוק אותם או לשייך אותם למטפל אחר? 
         <Route path="/delete-therapist/:id" element={<DeleteTherapist />} />*/}
