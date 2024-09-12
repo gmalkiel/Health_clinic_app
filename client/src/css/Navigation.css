@@ -1,0 +1,40 @@
+.side-navigation {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f4f4f4;
+    padding-top: 60px; /* השארת מקום לכותרת */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    text-align: right;
+  }
+  
+  .side-navigation ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .side-navigation li {
+    padding: 10px 20px 10px 40% ;
+  }
+  
+  .side-navigation li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    display: flex;
+    align-items: right;
+    justify-content: flex-end; /* חשוב - כדי שהאייקון יופיע קודם */
+    direction: rtl; /* הגדרת כיוון מימין לשמאל */
+  }
+  
+  .side-navigation li a:hover {
+    color: #66bb6a;
+  }
+  
+  .icon {
+    margin-left: 10px; /* רווח בין האייקון לכיתוב */
+    font-size: 1.2em;
+  }
+  
