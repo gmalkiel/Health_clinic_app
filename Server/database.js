@@ -21,9 +21,49 @@ export async function getManger(id) {
   const [rows] = await pool.query(`
   SELECT * 
   FROM Managers
-  WHERE IDNumber = ?
+  WHERE ManagerID = ?
   `, [id])
   return rows[0]
+}
+export async function getMangers(){
+  const [rows] = await pool.query(`
+    SELECT * 
+    FROM Managers`)
+    return rows[0]
+}
+export async function createManager(Name, IDNumber){
+  const [result] = await pool.query(`
+    INSERT INTO Managers (Name, IDNumber)
+    VALUES (?, ?)
+    `, [Name, IDNumber])
+    const id = result.insertId;
+    return getManger(id);
+}
+export async function deleteManager(ID) {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+  try {
+    // Disable SQL_SAFE_UPDATES
+    await connection.query(`
+      SET SQL_SAFE_UPDATES = 0;
+    `);
+
+    // Perform the DELETE operation
+    await connection.query(`
+      DELETE FROM Managers
+      WHERE IDNumber = ?
+    `, [ID]);
+
+    // Commit the transaction if everything succeeded
+    await connection.commit();
+  } catch (error) {
+    // Rollback the transaction in case of error
+    await connection.rollback();
+    throw new Error(`Failed to delete from Manager: ${error.message}`);
+  } finally {
+    // Release the connection back to the pool
+    connection.release();
+  }
 }
 
 //Therapists functions
@@ -170,6 +210,31 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
 }
 
 
+export async function getTherapistByPatientId(patientId) {
+  const connection = await pool.getConnection();
+  try {
+      // שאילתת SQL לשליפת המטפל לפי מזהה המטופל
+      const [rows] = await connection.execute(
+          `SELECT Therapists.* 
+           FROM TherapistPatients 
+           JOIN Therapists ON TherapistPatients.TherapistID = Therapists.TherapistID
+           WHERE TherapistPatients.PatientID = ?`,
+          [patientId]
+      );
+
+      // בדיקה אם נמצא מטפל
+      if (rows.length > 0) {
+          return rows[0]; // החזרת המטפל הראשון שנמצא
+      } else {
+          throw new Error('No therapist found for the given patient ID');
+      }
+  } catch (error) {
+      console.error('Error fetching therapist:', error);
+      throw error; // זריקת שגיאה במקרה של בעיה
+  } finally {
+      connection.release(); // שחרור חיבור למסד הנתונים
+  }
+}
 export async function updatePatient(patientId, patientData) {
   const updates = [];
   const values = [];
@@ -204,6 +269,9 @@ export async function updatePatient(patientId, patientData) {
               SET ${updates.join(', ')}
               WHERE PatientID = ?
           `;
+          console.log('Executing query:', query);
+          console.log('With values:', values);
+
           await pool.query(query, values);
       } catch (error) {
           console.error('Error updating patient:', error.message);
@@ -352,76 +420,115 @@ export async function createSession(PatientID, SessionDate, SessionContent, Sess
 }*/
 
 export async function createNewSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
-  try {
-    const imagePath = path.resolve(ArtworkImagePath);
-    const imageData = fs.readFileSync(imagePath); // Read the image data as binary
-    const [result] = await pool.query(`
-      INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
-      VALUES (?, ?, ?, ?, ?)
-    `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
 
-    const sessionId = result.insertId;
+  try {
+    // Step 1: Insert the new session
+    let sessionId;
+    try {
+      const imagePath = path.resolve(ArtworkImagePath);
+      const imageData = fs.readFileSync(imagePath); // Read the image data as binary
+      const [result] = await connection.query(`
+        INSERT INTO Sessions (SessionContent, SessionSummary, PatientID, ArtworkImage, SessionDate)
+        VALUES (?, ?, ?, ?, ?)
+      `, [SessionContent, SessionSummary, PatientID, imageData, SessionDate]);
+      sessionId = result.insertId;
+    } catch (error) {
+      console.error('Error inserting new session:', error.message);
+      await connection.rollback();
+      throw new Error('Failed to insert new session');
+    }
 
     // Step 2: Get the therapist for the patient
-    const [therapistRow] = await pool.query(`
-      SELECT TherapistID
-      FROM TherapistPatients
-      WHERE PatientID = ?
-    `, [PatientID]);
+    let therapistID;
+    try {
+      const [therapistRow] = await connection.query(`
+        SELECT TherapistID
+        FROM TherapistPatients
+        WHERE PatientID = ?
+      `, [PatientID]);
 
-    if (therapistRow.length === 0) {
-      throw new Error('No therapist found for the patient');
+      if (therapistRow.length === 0) {
+        throw new Error('No therapist found for the patient');
+      }
+
+      therapistID = therapistRow[0].TherapistID;
+    } catch (error) {
+      console.error('Error fetching therapist:', error.message);
+      await connection.rollback();
+      throw new Error('Failed to fetch therapist for the patient');
     }
-
-    const therapistID = therapistRow[0].TherapistID;
 
     // Step 3: Get the session price for the therapist
-    const [therapist] = await pool.query(`
-      SELECT SessionPrice
-      FROM Therapists
-      WHERE TherapistID = ?
-    `, [therapistID]);
+    let sessionPrice;
+    try {
+      const [therapist] = await connection.query(`
+        SELECT SessionPrice
+        FROM Therapists
+        WHERE TherapistID = ?
+      `, [therapistID]);
 
-    if (therapist.length === 0) {
-      throw new Error('No session price found for the therapist');
+      if (therapist.length === 0) {
+        throw new Error('No session price found for the therapist');
+      }
+
+      sessionPrice = therapist[0].SessionPrice;
+    } catch (error) {
+      console.error('Error fetching session price:', error.message);
+      await connection.rollback();
+      throw new Error('Failed to fetch session price for the therapist');
     }
-
-    const sessionPrice = therapist[0].SessionPrice;
 
     // Step 4: Update the patient's remaining sessions and balance
-    await pool.query(`
-      UPDATE Patients
-      SET remainingSessions = remainingSessions - 1,
-          remainingPayment = remainingPayment + ?
-      WHERE PatientID = ?
-    `, [sessionPrice, PatientID]);
-
-    // Step 5: Check if the patient's remainingPayment is greater than 0
-    const [patient] = await pool.query(`
-      SELECT Name, remainingPayment
-      FROM Patients
-      WHERE PatientID = ?
-    `, [PatientID]);
-
-    const patientName = patient[0].Name;
-    const remainingPayment = patient[0].remainingPayment;
-
-    if (remainingPayment > 0) {
-      const paymentAlertMessage = `התראת תשלום למטופל ${patientName} (ID: ${PatientID}) - יתרת תשלום: ${remainingPayment} ש"ח.`;
-
-      // Step 6: Insert the payment alert message for the therapist
-      await pool.query(`
-        INSERT INTO Messages (TherapistID, Content)
-        VALUES (?, ?)
-      `, [therapistID, paymentAlertMessage]);
+    try {
+      await connection.query(`
+        UPDATE Patients
+        SET remainingSessions = remainingSessions - 1,
+            remainingPayment = remainingPayment + ?
+        WHERE PatientID = ?
+      `, [sessionPrice, PatientID]);
+    } catch (error) {
+      console.error('Error updating patient balance:', error.message);
+      await connection.rollback();
+      throw new Error('Failed to update patient balance');
     }
 
-    // Step 7: Optionally, return the new session details
+    // Step 5: Check if the patient's remainingPayment is greater than 0
+    try {
+      const [patient] = await connection.query(`
+        SELECT Name, remainingPayment
+        FROM Patients
+        WHERE PatientID = ?
+      `, [PatientID]);
+
+      const patientName = patient[0].Name;
+      const remainingPayment = patient[0].remainingPayment;
+
+      if (remainingPayment > 0) {
+        const paymentAlertMessage = `התראת תשלום למטופל ${patientName} (ID: ${PatientID}) - יתרת תשלום: ${remainingPayment} ש"ח.`;
+
+        // Step 6: Insert the payment alert message for the therapist
+        await connection.query(`
+          INSERT INTO Messages (TherapistID, Content)
+          VALUES (?, ?)
+        `, [therapistID, paymentAlertMessage]);
+      }
+    } catch (error) {
+      console.error('Error handling payment alert:', error.message);
+      await connection.rollback();
+      throw new Error('Failed to handle payment alert');
+    }
+
+    await connection.commit();
     return getSession(sessionId); // Assuming you have a getSession function to retrieve the session
 
   } catch (error) {
+    await connection.rollback();
     console.error('Error in createNewSession:', error.message);
     throw error;
+  } finally {
+    connection.release();
   }
 }
 
@@ -462,29 +569,50 @@ export async function deleteTherapist(therapistID) {
   await connection.beginTransaction();
 
   try {
-    // Delete appointments related to the therapist
-    await connection.query(`
-      DELETE FROM Appointments
-      WHERE TherapistID = ?
-    `, [therapistID]);
+    // 1. Delete appointments related to the therapist
+    try {
+      await connection.query(`
+        DELETE FROM Appointments
+        WHERE TherapistID = ?
+      `, [therapistID]);
+    } catch (error) {
+      await connection.rollback();
+      throw new Error(`Failed to delete appointments: ${error.message}`);
+    }
 
-    // Delete the therapist from TherapistPatients table
-    await connection.query(`
-      DELETE FROM TherapistPatients
-      WHERE TherapistID = ?
-    `, [therapistID]);
+    // 2. Delete the therapist from TherapistPatients table
+    try {
+      await connection.query(`
+        DELETE FROM TherapistPatients
+        WHERE TherapistID = ?
+      `, [therapistID]);
+    } catch (error) {
+      await connection.rollback();
+      throw new Error(`Failed to delete from TherapistPatients: ${error.message}`);
+    }
 
-    // Delete messages related to the therapist
-    await connection.query(`
-      DELETE FROM Messages
-      WHERE TherapistID = ?
-    `, [therapistID]);
+    // 3. Delete messages related to the therapist
+    try {
+      await connection.query(`
+        DELETE FROM Messages
+        WHERE TherapistID = ?
+      `, [therapistID]);
+    } catch (error) {
+      await connection.rollback();
+      throw new Error(`Failed to delete messages: ${error.message}`);
+    }
 
-    // Delete the therapist from Therapists table
-    const [result] = await connection.query(`
-      DELETE FROM Therapists
-      WHERE TherapistID = ?
-    `, [therapistID]);
+    // 4. Delete the therapist from Therapists table
+    let result;
+    try {
+      [result] = await connection.query(`
+        DELETE FROM Therapists
+        WHERE TherapistID = ?
+      `, [therapistID]);
+    } catch (error) {
+      await connection.rollback();
+      throw new Error(`Failed to delete therapist: ${error.message}`);
+    }
 
     await connection.commit();
     return result;
@@ -495,6 +623,7 @@ export async function deleteTherapist(therapistID) {
     connection.release();
   }
 }
+
 
 
 //Appointments functions
