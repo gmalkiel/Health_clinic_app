@@ -175,7 +175,21 @@ app.get("/session/:id", async (req, res) => {
       res.status(500).send('Error retrieving session');
   }
 });
-
+app.get("/session_/:id", async (req, res) => {
+  const { id } = req.params;
+  const {date} = req.body;
+  try {
+      const session = await db.getSession_(date,id);
+      if (session) {
+          res.send(session);
+      } else {
+          res.status(404).send('Session not found');
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving session');
+  }
+});
 
 app.put('/patient/:id', async (req, res) => {
     try {
