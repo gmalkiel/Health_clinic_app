@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../css/AddRestOfPatient.css'; // Import the CSS file
 
 const AddRestOfPatient = () => {
     const { PatientID } = useParams(); // Get PatientID from the URL
     const [patient, setPatient] = useState(null);
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         TreatmentGoals: "",
         Diagnoses: "",
@@ -67,9 +69,11 @@ const AddRestOfPatient = () => {
                 body: JSON.stringify({ ...formData}),
             });
             if (!response.ok) throw new Error('Failed to update patient');
-            
-            const data = await response.json();
+            const res = await fetch(`http://localhost:8080/therapist/${PatientID}/therapist`);
+            const data = await res.json();
+          
             console.log("Patient updated successfully:", data);
+            navigate(`/home/therapist/${data.UserName}`);
             debugger;
         } catch (error) {
             console.error("Error updating patient:", error);

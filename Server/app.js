@@ -24,6 +24,10 @@ app.get("/manager/:id", async (req, res) => {
   const manager = await db.getManger(id);
   res.send(manager);
 });
+app.get("/managers", async (req, res) => {
+  const manager = await db.getMangers();
+  res.send(manager);
+});
 app.get("/therapists", async (req, res) => {
   const therapists = await db.getAllTherapists();
   res.send(therapists);
@@ -63,7 +67,20 @@ app.get("/patient/:id", async (req, res) => {
       res.status(500).send('Error retrieving patient');
   }
 });
-
+app.get("/therapist/:PatientId/therapist", async (req, res) => {
+  const { PatientId } = req.params;
+  try {
+      const therapist = await db.getTherapistByPatientId(PatientId);
+      if (therapist) {
+          res.send(therapist);
+      } else {
+          res.status(404).send('therapist not found');
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving therapist');
+  }
+});
 app.get("/patients", async (req, res) => {
   try {
       const patients = await db.getAllPatients();
@@ -116,8 +133,8 @@ app.get("/session/:id", async (req, res) => {
 
 app.put('/patient/:id', async (req, res) => {
     try {
-        await db.updatePatient(req.params.id, req.body);
-        res.status(200).json({ message: 'Patient updated' });
+    
+        res.status(200).json({message:"upasete sucess"});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -136,7 +153,7 @@ app.delete('/therapist/:id', async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error deleting therapist');
+    res.status(500).send(`${error}`);
   }
 });
 //Sessions functions 
@@ -185,7 +202,20 @@ app.post("/therapist", async (req, res) => {
     res.status(500).json({ error: 'Error adding therapist' });
   }
 });
+app.post("/manager", async (req, res) => {
+  const {Name,IDNumber} = req.body;
 
+  try {
+  
+    // Create new therapist if no conflict
+    const manager = await db.createManager(Name,IDNumber);
+    res.status(200).json(manager);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error adding manager' });
+  }
+});
 app.post('/session/:PatientID', async (req, res) => {
   const { PatientID } = req.params;
   const { SessionContent, SessionSummary, ImagePath,CurrentDate } = req.body;
@@ -211,11 +241,10 @@ app.post('/addsession/:PatientID', async (req, res) => {
     const newSession = await db.createNewSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
     res.status(200).send(newSession);
   } catch (error) {
-    console.error('Error creating session:', error.message);
+    console.error(error);
     res.status(500).send('Error creating session');
   }
 });
-
 
 
 app.post('/addPatient', async (req, res) => {
@@ -412,7 +441,21 @@ app.get('/messages/:therapistID', async (req, res) => {
       res.status(500).send(error.message);
   }
 });
+app.delete("/manager/:IDNumber", async (req, res) => {
+  const { IDNumber } = req.params;
 
+  try {
+    const result = await db.deleteManager(IDNumber);
+    if (result.affectedRows > 0) {
+      res.send(`Manager with ID ${IDNumber} has been deleted`);
+    } else {
+      res.status(404).send('Maneger not found');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
 
 //General functions
 app.use((err, req, res, next) => {

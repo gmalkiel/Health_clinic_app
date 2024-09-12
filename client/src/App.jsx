@@ -13,6 +13,7 @@ import AddPatient from '../src/components/AddPatient';
 import AddRestOfPatient from '../src/components/AddRestOfPatient';
 import MeetingSummary  from '../src/components/MeetingSummary';
 import PatientDetails from '../src/components/PatientDetails';
+import Replace_Manager from './components/Replace_Manager';
 function App() {
   return (
     <Router>
@@ -20,6 +21,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/home/:IsManager/:T_User_Name" element={<Home />} />
+        <Route path="/replaceManagernager" element={<Replace_Manager/>} />
         <Route path="/meetingSummary" element={<MeetingSummary />} />
         <Route path="/" element={<Login />} />
         <Route path="/therapists" element={<Therapists />} />

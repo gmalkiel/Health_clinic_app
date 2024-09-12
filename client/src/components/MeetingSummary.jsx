@@ -11,7 +11,7 @@ const MeetingSummary = () => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    setImagePath(file.name); // Set file name, not path
+    setImagePath(file); // Set file name, not path
   };
   
 
@@ -32,19 +32,16 @@ const MeetingSummary = () => {
     e.preventDefault();
   
     const PatientId = await getPatientId(patientID);
-    const currentDate = new Date();
     try {
-      const response = await fetch(`/session/${PatientId}`, {
+      const response = await fetch(`/addsession/${PatientId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
            // Get current date
-          CurrentDate:currentDate,
           SessionContent: meetingContent,
           SessionSummary: summary,
-          PatientID: PatientId,
           ImagePath: imagePath, // Send image path
         }),
       });
