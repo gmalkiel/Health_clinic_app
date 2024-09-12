@@ -6,14 +6,12 @@ const MeetingSummary = () => {
   const [patientID, setPatientID] = useState('');
   const [meetingContent, setMeetingContent] = useState('');
   const [summary, setSummary] = useState('');
-  const [imagePath, setImagePath] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setImagePath(file); // Set file name, not path
+    setImageFile(e.target.files[0]);
   };
-  
 
   async function getPatientId(idNumber) {
     try {
@@ -30,24 +28,27 @@ const MeetingSummary = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const PatientId = await getPatientId(patientID);
+    const formData = new FormData();
+    formData.append('SessionContent', meetingContent);
+    formData.append('SessionSummary', summary);
+    formData.append('PatientID', PatientId);
+    if (imageFile) {
+      formData.append('Image', imageFile);
+    }
+
     try {
-      const response = await fetch(`/addsession/${PatientId}`, {
+      const response = await fetch(`http://localhost:8080/addsession`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-           // Get current date
-          SessionContent: meetingContent,
-          SessionSummary: summary,
-          ImagePath: imagePath, // Send image path
-        }),
+        body: formData
       });
       if (response.ok) {
         console.log('Meeting summary submitted successfully');
-        navigate(`/home`);
+        const res = await fetch(`http://localhost:8080/therapist/${PatientId}/therapist`);
+        const data = await res.json();
+        console.log("Patient updated successfully:", data);
+        navigate(`/home/therapist/${data.UserName}`);
       } else {
         console.log('Error submitting the meeting summary');
       }
@@ -55,7 +56,7 @@ const MeetingSummary = () => {
       console.error('Error:', error);
     }
   };
-  
+
   return (
     <form onSubmit={handleSubmit}>
       <label>
@@ -75,6 +76,7 @@ const MeetingSummary = () => {
           onChange={(e) => setPatientID(e.target.value)}
         />
       </label>
+      <br />
       <label>
         Meeting Content:
         <textarea

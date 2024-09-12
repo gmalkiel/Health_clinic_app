@@ -1,23 +1,65 @@
 import express from "express";
 import cors from "cors";
 import * as db from "./database.js";
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-
+// יצירת __dirname בסביבת ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173' // Adjust the port if needed
+}));
 app.use(express.json());
 app.use(express.static('client'));
 app.listen(8080, () => {
   console.log('Server is running on port 8080')
 })
+// Set up multer for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    try {
+      // מנסים להגדיר את הנתיב לשמירת הקובץ
+      cb(null, path.join(__dirname, 'img')); // Directory where files will be saved
+    } catch (error) {
+      // במקרה של שגיאה, נתפוס את השגיאה ונדווח עליה
+      console.error("Error in destination function:", error);
+      cb(error, null); // מחזירים את השגיאה ל-callback
+    }
+  },
+  filename: function (req, file, cb) {
+    try {
+      // מנסים לשמור את הקובץ עם השם המקורי שלו
+      cb(null, file.originalname);  // Keep the original file name
+    } catch (error) {
+      // במקרה של שגיאה, נתפוס את השגיאה ונדווח עליה
+      console.error("Error in filename function:", error);
+      cb(error, null); // מחזירים את השגיאה ל-callback
+    }
+  }
+});
 
+const upload = multer({ storage: storage });
 
-// Middleware for handling JSON requests
-app.use(express.json());
-app.use(express.static('client'));
+app.post('/addsession', upload.single('Image'), async (req, res) => {
+  const { SessionContent, SessionSummary, PatientID } = req.body;
+  const ImagePath = req.file ? req.file.path : null;
 
-app.use(cors({
-  origin: 'http://localhost:5173' // Adjust the port if needed
-}));
+  try {
+    const currentDate = new Date();
+    const newSession = await db.createNewSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
+    res.status(200).send(newSession);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error
+      
+    );
+  }
+});
+
 /*GET */
 app.get("/manager/:id", async (req, res) => {
   const id = req.params.id;
@@ -231,7 +273,7 @@ app.post('/session/:PatientID', async (req, res) => {
     res.status(500).send('Error creating session');
   }
 });
-
+/*
 app.post('/addsession/:PatientID', async (req, res) => {
   const { PatientID } = req.params;
   const { SessionContent, SessionSummary, ImagePath } = req.body;
@@ -244,7 +286,7 @@ app.post('/addsession/:PatientID', async (req, res) => {
     console.error(error);
     res.status(500).send('Error creating session');
   }
-});
+});*/
 
 
 app.post('/addPatient', async (req, res) => {
