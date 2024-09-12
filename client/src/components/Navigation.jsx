@@ -33,7 +33,7 @@ const Navigation = () => {
           </Link>
         </li>
         <li>
-          <Link to="/replaceManager">
+          <Link to="/replace_Manager">
             <FaUserCog className="icon" /> החלפת מנהל
           </Link>
         </li>
