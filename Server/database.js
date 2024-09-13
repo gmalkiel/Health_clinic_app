@@ -653,6 +653,7 @@ export async function getAllAppointments() {
           a.Location,
           p.Name AS PatientName,
           p.Age AS PatientAge,
+          p.PatientID AS patientID,
           t.Name AS TherapistName,
           t.IDNumber AS TherapistIDNumber
       FROM 

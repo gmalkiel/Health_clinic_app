@@ -5,6 +5,8 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { validatePatient, validateTherapist } from './validationMiddleware.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -17,6 +19,10 @@ app.use(express.static('client'));
 app.listen(8080, () => {
   console.log('Server is running on port 8080')
 })
+
+app.use('/patients', validatePatient);
+//app.use('/therapists', validateTherapist);
+
 // Set up multer for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -175,9 +181,9 @@ app.get("/session/:id", async (req, res) => {
       res.status(500).send('Error retrieving session');
   }
 });
-app.get("/session_/:id", async (req, res) => {
-  const { id } = req.params;
-  const {date} = req.body;
+app.get("/session_/:id/:date", async (req, res) => {
+  const { id ,date} = req.params;
+  
   try {
       const session = await db.getSession_(date,id);
       if (session) {
