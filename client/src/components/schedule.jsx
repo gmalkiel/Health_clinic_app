@@ -90,7 +90,15 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-
+    const IsSeesion = async (ID) => {
+        try {
+            const response = await fetch(`http://localhost:8080/${gg}/${ID}`);
+            return await response.json();
+        } catch (error) {
+            console.error("Error checking session:", error);
+            throw error;
+        }
+    };
     const handleEventClick = (event) => {
         const eventDate = moment(event.start);
         const today = moment();
@@ -99,7 +107,15 @@ const Schedule = ({ userType, username }) => {
             // אם התאריך בעבר - נשלח לעמוד תצוגה בלבד
             navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
         } else if (eventDate.isSame(today, 'day')) {
-            // אם התאריך הוא היום - נבדוק אם קיים סיכום
+            const res = IsSeesion(event.id);
+            if(res.ok){
+                navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
+            }
+            else{
+                  // אין סיכום קיים - נשלח לעמוד הוספת סיכום
+                  navigate(`/meetingSummary`, { state: { sessionId: event.id } });
+            }
+            /* אם התאריך הוא היום - נבדוק אם קיים סיכום
             fetch(`/session/${event.id}`)
                 .then(res => res.json())
                 .then(data => {
@@ -114,7 +130,8 @@ const Schedule = ({ userType, username }) => {
                 .catch(error => {
                     console.error('Error fetching session:', error);
                     setError('Error fetching session data');
-                });
+                });*/
+            
         }
     };
 

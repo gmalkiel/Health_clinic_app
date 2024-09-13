@@ -175,9 +175,9 @@ app.get("/session/:id", async (req, res) => {
       res.status(500).send('Error retrieving session');
   }
 });
-app.get("/session_/:id", async (req, res) => {
-  const { id } = req.params;
-  const {date} = req.body;
+app.get("/session_/:id/:date", async (req, res) => {
+  const { id ,date} = req.params;
+  
   try {
       const session = await db.getSession_(date,id);
       if (session) {
