@@ -74,8 +74,13 @@ const handleSubmit = async (e) => {
                 RemainingSessions: 4,
             };
             const result = await addPatient(patientData);
-            console.log("Patient added successfully:", result);
-            navigate('/home/admin/Yosi')
+            if (typeof result === 'object' && result !== null && 'error' in result) {
+              setError(result.error);
+            } else {
+              console.log("Patient added successfully:", result);
+              navigate('/home/admin/Yosi')
+            }
+            
             //setError("");
         }
     } catch (error) {
