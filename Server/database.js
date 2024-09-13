@@ -392,12 +392,13 @@ export async function getSession(sessionId) {
 }
 //פונקציה זו תביא לי מפגש בהתאם לתאריך והמטופל שמשויך אליה
 export async function getSession_( SessionDate ,PatientID) {
+  const dateOnly = new Date(SessionDate).toISOString().split('T')[0]; // ממיר את התאריך לפורמט YYYY-MM-DD
   const [rows] = await pool.query(`
-  SELECT * 
-  FROM Sessions
-  WHERE SessionDate = ?
-  AND  PatientID = ?
-  `, [SessionDate,PatientID]);
+    SELECT * 
+    FROM Sessions
+    WHERE DATE(SessionDate) = ?
+    AND PatientID = ?
+  `, [dateOnly, PatientID]);
   return rows[0];
 }
 
@@ -662,7 +663,7 @@ export async function getAllAppointments() {
 
 export async function getTherapistAppointments(id) {
   const [rows] = await pool.query(`
-    SELECT a.*,  t.Name as TherapistName, p.Name as PatientName
+    SELECT a.*,  t.Name as TherapistName,p.PatientID as patientID, p.Name as PatientName
     FROM Appointments a
     JOIN Therapists t ON a.TherapistID = t.TherapistID
     JOIN Patients p ON a.PatientID = p.PatientID
