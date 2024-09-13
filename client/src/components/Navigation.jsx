@@ -56,6 +56,18 @@ const Navigation = () => {
                 <FaCalendarAlt className="icon" /> לוח זמנים
               </Link>
             </li>
+            <li>
+              <Link to="/addTherapist">
+                <FaClipboardList className="icon" />  הוספת מטפל
+              </Link>
+            </li>
+            <li>
+              <Link to="/addPatient">
+                <FaClipboardList className="icon" /> הוספת מטופל 
+              </Link>
+            </li>
+          
+            
           </>
         ) : (
           <>
