@@ -1,43 +1,63 @@
 .patient-list-container {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    margin-top: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.filters-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  direction: rtl; 
+}
+
+.filters-container input,
+.filters-container select {
+  margin-left: 10px; 
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.patient-row {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  direction: rtl;
+}
+
+.patient-row span {
+  margin-right: 15px; 
+}
+
+.user-icon {
+  color: #4caf50;
+  font-size: 24px;
+  margin-left: 15px; 
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .patient-list-container {
+    margin-top: 50px; /* Still maintain the 50px margin */
   }
   
   .filters-container {
-    display: flex;
-    justify-content: flex-end;
+    justify-content: center; /* Center the filter container on smaller screens */
     margin-bottom: 20px;
-    direction: rtl; /* מימין לשמאל */
-  }
-  
-  .filters-container input,
-  .filters-container select {
-    margin-left: 10px; /* רווח בין האלמנטים */
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
   }
   
   .patient-row {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    direction: rtl; /* מימין לשמאל */
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .patient-row span {
-    margin-right: 15px; /* רווח בין השדות */
-  }
-  
+
   .user-icon {
-    color: #4caf50;
-    font-size: 24px;
-    margin-left: 15px; /* האייקון בצד ימין */
+    margin-left: 0; /* Align icon with text */
+    margin-bottom: 10px;
   }
-  
+}
