@@ -73,6 +73,7 @@ const Schedule = ({ userType, username }) => {
                                 title: userType === 'admin' ? `${appt.PatientName} with ${appt.TherapistName}` : `${appt.PatientName}`,
                                 start: new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime), // תאריך ושעה
                                 end: new Date(new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime).getTime() + 60 * 60 * 1000), // הוספת שעה אחת
+                                PatientID: appt.patientID
                             }
                         )
                     );
@@ -90,50 +91,44 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-    const IsSeesion = async (ID) => {
+    const IsSeesion = async (PatientID) => {
         try {
-            const response = await fetch(`http://localhost:8080/${gg}/${ID}`);
-            return await response.json();
+            const cuurentDate = new Date();
+            const response = await fetch(`http://localhost:8080/session_/${PatientID}/${cuurentDate}`);
+            if (response.ok){
+            const data = await response.json();
+            return data;}
+            else{
+                return 0;
+            }
         } catch (error) {
             console.error("Error checking session:", error);
             throw error;
         }
     };
-    const handleEventClick = (event) => {
+    const handleEventClick = async (event) => {
         const eventDate = moment(event.start);
         const today = moment();
-
+    
         if (eventDate.isBefore(today, 'day')) {
             // אם התאריך בעבר - נשלח לעמוד תצוגה בלבד
             navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
         } else if (eventDate.isSame(today, 'day')) {
-            const res = IsSeesion(event.id);
-            if(res.ok){
-                navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
+            try {
+                const res = await IsSeesion(event.PatientID);
+                if (res) {
+                    navigate(`/sessions/${res.SessionID}`, { state: { viewOnly: true } });
+                } else {
+                    // אין סיכום קיים - נשלח לעמוד הוספת סיכום
+                    navigate(`/meetingSummary`, { state: { sessionId: event.id } });
+                }
+            } catch (error) {
+                console.error('Error checking session:', error);
+                setError('Error checking session data');
             }
-            else{
-                  // אין סיכום קיים - נשלח לעמוד הוספת סיכום
-                  navigate(`/meetingSummary`, { state: { sessionId: event.id } });
-            }
-            /* אם התאריך הוא היום - נבדוק אם קיים סיכום
-            fetch(`/session/${event.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.SessionSummary) {
-                        // יש סיכום קיים - נשלח לעמוד תצוגה בלבד
-                        navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
-                    } else {
-                        // אין סיכום קיים - נשלח לעמוד הוספת סיכום
-                        navigate(`/meetingSummary`, { state: { sessionId: event.id } });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching session:', error);
-                    setError('Error fetching session data');
-                });*/
-            
         }
     };
+    
 
     return (
         <>
@@ -169,17 +164,7 @@ const Schedule = ({ userType, username }) => {
             />
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
-        {/* הכפתור ממוקם בתחתית הדף, מעל הלו"ז */}
-        {userType === 'therapist' && (
-            <div className="add-appointment-overlay">
-                <button
-                    onClick={() => window.location.href = '/add-appointment'}
-                >
-                    <FaPlus /> {/* אייקון הפלוס */}
-                    הוספת פגישה
-                </button>
-            </div>
-        )}
+  
         </>
     );
 };
