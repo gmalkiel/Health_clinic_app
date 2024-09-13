@@ -99,7 +99,7 @@ const AddTherapist = () => {
             />
           </div>
         ))}
-        <button class="addT" type="submit">Add Therapist</button>
+        <button className="addT" type="submit">Add Therapist</button>
       </form>
     </div>
   );
