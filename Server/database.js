@@ -396,6 +396,16 @@ export async function getSession(sessionId) {
   `, [sessionId]);
   return rows[0];
 }
+//פונקציה זו תביא לי מפגש בהתאם לתאריך והמטופל שמשויך אליה
+export async function getSession_( SessionDate ,PatientID) {
+  const [rows] = await pool.query(`
+  SELECT * 
+  FROM Sessions
+  WHERE SessionDate = ?
+  AND  PatientID = ?
+  `, [SessionDate,PatientID]);
+  return rows[0];
+}
 
 export async function createSession(PatientID, SessionDate, SessionContent, SessionSummary, ArtworkImagePath) {
   setSuccess('im in create');

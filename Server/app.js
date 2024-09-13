@@ -175,7 +175,21 @@ app.get("/session/:id", async (req, res) => {
       res.status(500).send('Error retrieving session');
   }
 });
-
+app.get("/session_/:id", async (req, res) => {
+  const { id } = req.params;
+  const {date} = req.body;
+  try {
+      const session = await db.getSession_(date,id);
+      if (session) {
+          res.send(session);
+      } else {
+          res.status(404).send('Session not found');
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving session');
+  }
+});
 
 app.put('/patient/:id', async (req, res) => {
     try {
@@ -262,38 +276,6 @@ app.post("/manager", async (req, res) => {
     res.status(500).json({ error: 'Error adding manager' });
   }
 });
-/*
-app.post('/session/:PatientID', async (req, res) => {
-  const { PatientID } = req.params;
-  const { SessionContent, SessionSummary, ImagePath,CurrentDate } = req.body;
-
-  try {
-   
-
-    // Insert data into database
-    const newSession = await db.createNewSession(PatientID, CurrentDate, SessionContent, SessionSummary, ImagePath);
-    res.status(200).send(newSession);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error creating session');
-  }
-});
-*/
-/*
-app.post('/session/:PatientID', async (req, res) => {
-  const { PatientID } = req.params;
-  const { SessionContent, SessionSummary, ImagePath } = req.body;
-
-  try {
-    const currentDate = new Date();
-    const newSession = await db.createNewSession(PatientID, currentDate, SessionContent, SessionSummary, ImagePath);
-    res.status(200).send(newSession);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error creating session');
-  }
-});
-*/
 
 app.post('/addPatient', async (req, res) => {
   if (!req.body) {

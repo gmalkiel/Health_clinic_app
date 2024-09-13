@@ -63,10 +63,10 @@ const Patients = () => {
   }, [searchTerm, sortField, ageFilter, patients]);
 
   const handleRowClick = (patientId) => {
-    
-    const PatientID = patients.at(patientId).PatientID;
+    debugger;
+    //const PatientID = patients.at(patientId).PatientID;
     // Navigate to the patient details page
-    navigate(`/PatientDetails/${PatientID}`);
+    navigate(`/PatientDetails/${patientId}`);
   };
 
   if (error) {

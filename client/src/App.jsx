@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../src/components/Home';
 import Login from '../src/components/login';
-import Header from '../src/components/Header';
 import Therapists from '/src/components/Therapists';
 import Patients from '../src/components/Patients';
 import AddTherapist from '../src/components/AddTherapist';
@@ -24,6 +23,7 @@ function App() {
        <Layout /> {/* Header will be displayed on all pages */}
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/home/:IsManager/:T_User_Name" element={<Home />} />
         <Route path="/replaceManager" element={<Replace_Manager/>} />
         <Route path="/meetingSummary" element={<MeetingSummary />} />

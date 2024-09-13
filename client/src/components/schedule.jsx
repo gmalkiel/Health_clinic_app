@@ -4,8 +4,10 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import '../css/Schedule.css'; 
 import { FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const localizer = momentLocalizer(moment);
+
 function generateRecurringAppointments(startDate, appointmentTime, count, frequency = 7, appointmentDetails) {
     const appointments = [];
     let currentDate = moment(startDate);
@@ -31,11 +33,13 @@ function generateRecurringAppointments(startDate, appointmentTime, count, freque
 
     return appointments;
 }
+
 const Schedule = ({ userType, username }) => {
     const [appointments, setAppointments] = useState([]);
     const [view, setView] = useState('month'); // Default view is month
     const [currentDate, setCurrentDate] = useState(new Date());
     const [error, setError] = useState(''); // Error state
+    const navigate = useNavigate(); // Navigate function
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -65,6 +69,7 @@ const Schedule = ({ userType, username }) => {
                             4,
                             7, // מחזור שבועי
                             {
+                                id: appt.AppointmentID, // נשתמש ב-id לצורך לחיצה על הפגישה
                                 title: userType === 'admin' ? `${appt.PatientName} with ${appt.TherapistName}` : `${appt.PatientName}`,
                                 start: new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime), // תאריך ושעה
                                 end: new Date(new Date(appt.AppointmentsDay + 'T' + appt.AppointmentsTime).getTime() + 60 * 60 * 1000), // הוספת שעה אחת
@@ -85,11 +90,37 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-    
+
+    const handleEventClick = (event) => {
+        const eventDate = moment(event.start);
+        const today = moment();
+
+        if (eventDate.isBefore(today, 'day')) {
+            // אם התאריך בעבר - נשלח לעמוד תצוגה בלבד
+            navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
+        } else if (eventDate.isSame(today, 'day')) {
+            // אם התאריך הוא היום - נבדוק אם קיים סיכום
+            fetch(`/session/${event.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.SessionSummary) {
+                        // יש סיכום קיים - נשלח לעמוד תצוגה בלבד
+                        navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
+                    } else {
+                        // אין סיכום קיים - נשלח לעמוד הוספת סיכום
+                        navigate(`/meetingSummary`, { state: { sessionId: event.id } });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching session:', error);
+                    setError('Error fetching session data');
+                });
+        }
+    };
+
     return (
         <>
         <div className="calendar-container">
-          
             <Calendar
                 localizer={localizer}
                 events={appointments}
@@ -100,6 +131,7 @@ const Schedule = ({ userType, username }) => {
                 onView={(view) => setView(view)}
                 date={currentDate}
                 onNavigate={(date) => setCurrentDate(date)}
+                onSelectEvent={handleEventClick} // ניהול לחיצה על פגישה
                 eventPropGetter={(event) => ({
                     style: {
                         backgroundColor: event.title.includes('with') ? 'lightblue' : 'lightgreen',
@@ -118,19 +150,19 @@ const Schedule = ({ userType, username }) => {
                 
                 style={{ height: '100%' }}
             />
-             {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
         {/* הכפתור ממוקם בתחתית הדף, מעל הלו"ז */}
         {userType === 'therapist' && (
-                <div className="add-appointment-overlay">
-                    <button
-                        onClick={() => window.location.href = '/add-appointment'}
-                    >
-                        <FaPlus /> {/* אייקון הפלוס */}
-                        הוספת פגישה
-                    </button>
-                </div>
-            )}
+            <div className="add-appointment-overlay">
+                <button
+                    onClick={() => window.location.href = '/add-appointment'}
+                >
+                    <FaPlus /> {/* אייקון הפלוס */}
+                    הוספת פגישה
+                </button>
+            </div>
+        )}
         </>
     );
 };
