@@ -1,4 +1,40 @@
-import { body, validationResult } from 'express-validator';
+import { sessionSchema, patientSchema, therapistSchema } from './validationSchemas.js';
+
+export function validateSession(req, res, next) {
+  const { error } = sessionSchema.validate(req.body);
+  
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  
+  next();
+}
+
+
+// validating Patient data
+export function validatePatient(req, res, next) {
+  const { error } = patientSchema.validate(req.body);
+  
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  
+  next();
+}
+
+// validating Therapist data
+export function validateTherapist(req, res, next) {
+  const { error } = therapistSchema.validate(req.body);
+  
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  
+  next();
+}
+
+
+/*import { body, validationResult } from 'express-validator';
 
 // Validate patient data
 export const validatePatient = [
@@ -29,3 +65,4 @@ export const validateTherapist = [
     next();
   }
 ];
+*/

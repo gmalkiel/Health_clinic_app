@@ -171,13 +171,11 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
   const connection = await pool.getConnection();
 
   try {
-    // המרת הערכים למספרים
     const age = parseInt(Age);
     const siblingPosition = SiblingPosition !== null ? parseInt(SiblingPosition) : null;
     const siblingsNumber = SiblingsNumber !== null ? parseInt(SiblingsNumber) : null;
     const remainingPayment = RemainingPayment !== null ? parseFloat(RemainingPayment) : null;
 
-    // הכנסת המטופל לטבלת Patients
     const [result] = await connection.query(`
       INSERT INTO Patients (
         Name, 
@@ -195,17 +193,14 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [Name, age, IDNumber, MaritalStatus, siblingPosition, siblingsNumber, EducationalInstitution, Medication, ReferralSource, RemainingSessions, remainingPayment, AppointmentTime]);
 
-    // שמירת ה־PatientID שנוצר
     const patientId = result.insertId;
 
-    // הוספת רשומה לטבלת TherapistPatients לקשר בין מטפל למטופל
     await connection.query(`
       INSERT INTO TherapistPatients (TherapistID, PatientID)
       VALUES (?, ?)
     `, [TherapistID, patientId]);
     let message =  `תור למטופל: ${Name}, עם מספר תעודת זהות: ${IDNumber}.`
     addMessage(TherapistID,message);
-    // החזרת המטופל שהתווסף
     return getPatient(patientId);
   } catch (error) {
     console.error('Error:', error.message);
@@ -219,7 +214,6 @@ export async function createPatient(Name, Age, IDNumber, MaritalStatus = null, S
 export async function getTherapistByPatientId(patientId) {
   const connection = await pool.getConnection();
   try {
-      // שאילתת SQL לשליפת המטפל לפי מזהה המטופל
       const [rows] = await connection.execute(
           `SELECT Therapists.* 
            FROM TherapistPatients 
@@ -230,15 +224,15 @@ export async function getTherapistByPatientId(patientId) {
 
       // בדיקה אם נמצא מטפל
       if (rows.length > 0) {
-          return rows[0]; // החזרת המטפל הראשון שנמצא
+          return rows[0]; 
       } else {
           throw new Error('No therapist found for the given patient ID');
       }
   } catch (error) {
       console.error('Error fetching therapist:', error);
-      throw error; // זריקת שגיאה במקרה של בעיה
+      throw error; 
   } finally {
-      connection.release(); // שחרור חיבור למסד הנתונים
+      connection.release(); 
   }
 }
 export async function updatePatient(patientId, patientData) {

@@ -4,8 +4,9 @@ import * as db from "./database.js";
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { validateSession, validatePatient, validateTherapist } from './validationMiddleware.js';
 
-import { validatePatient, validateTherapist } from './validationMiddleware.js';
+//import { validatePatient, validateTherapist } from './validationMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ app.listen(8080, () => {
   console.log('Server is running on port 8080')
 })
 
-app.use('/patients', validatePatient);
+//app.use('/patients', validatePatient);
 //app.use('/therapists', validateTherapist);
 
 // Set up multer for file upload
@@ -49,7 +50,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/addsession', upload.single('Image'), async (req, res) => {
+app.post('/addsession', validateSession, upload.single('Image'), async (req, res) => {
   const { SessionContent, SessionSummary, PatientID } = req.body;
   const ImagePath = req.file ? req.file.path : null;
 
@@ -283,7 +284,7 @@ app.post("/manager", async (req, res) => {
   }
 });
 
-app.post('/addPatient', async (req, res) => {
+app.post('/addPatient', validatePatient, async (req, res) => {
   if (!req.body) {
     return res.status(400).send('Request body is missing');
   }
@@ -292,11 +293,10 @@ app.post('/addPatient', async (req, res) => {
 
   try {
     // בדיקה האם כל השדות החיוניים קיימים
-    if (!TherapistID || !Name || !Age || !IDNumber) {
+    if (!TherapistID || !Name || !Age || !IDNumber || !RemainingPayment) {
       return res.status(400).send('Missing required fields');
     }
 
-    // המרת RemainingPayment ו- RemainingSessions לערכים נדרשים (אם לא סופקו, יהיו NULL)
     const newPatientId = await db.createPatient(
       Name,
       Age,
@@ -308,8 +308,8 @@ app.post('/addPatient', async (req, res) => {
       Medication || null,
       ReferralSource || null,
       TherapistID,
-      RemainingPayment !== undefined ? RemainingPayment : null, // טיפול במקרים בהם RemainingPayment אינו מוגדר
-      RemainingSessions !== undefined ? RemainingSessions : null // טיפול במקרים בהם RemainingSessions אינו מוגדר
+      RemainingPayment !== undefined ? RemainingPayment : null,
+      RemainingSessions !== undefined ? RemainingSessions : null 
     );
 
     res.status(200).send({ patientId: newPatientId });
@@ -325,11 +325,9 @@ app.post("/check-conflicts", async (req, res) => {
   const { oldTherapistID, newTherapistID } = req.body;
   
   try {
-    // Query to get appointments for both therapists
     const oldTherapistAppointments = await db.getTherapistAppointments(oldTherapistID);
     const newTherapistAppointments = await db.getTherapistAppointments(newTherapistID);
     
-    // Check for conflicts (you could refine this based on specific criteria like date overlap)
     const conflicts = oldTherapistAppointments.filter(oldAppt => 
       newTherapistAppointments.some(newAppt => 
         oldAppt.Date === newAppt.Date && oldAppt.Time === newAppt.Time
