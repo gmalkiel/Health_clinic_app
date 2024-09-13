@@ -16,6 +16,7 @@ import Replace_Manager from './components/Replace_Manager';
 import Layout from '../src/components/Layout';
 import { UserProvider } from '../src/components/UserContext';
 import SessionDisplay from './components/SessionDisplay';
+import Messages from '../src/components/Messages';
 function App() {
   return (
     <UserProvider> 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/addRestOfPatient/:PatientID" element={<AddRestOfPatient />} />
         <Route path="/navigation" element={<Navigation />} />
         <Route path="/sessions/:SessionID" element={<SessionDisplay />} />
+        <Route path="/messages/:therapistID" element={<Messages />} />
 
         {/*טיפול במצב מחיקה של מטפל מה לעשות עם מטופלים שקשורים אליו האם למחוק אותם או לשייך אותם למטפל אחר? 
         <Route path="/delete-therapist/:id" element={<DeleteTherapist />} />*/}
