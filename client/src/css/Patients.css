@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   padding: 10px;
-  margin-top: 50px; 
-  min-height: 100vh; 
 }
 
 .filters-container {
@@ -40,4 +38,26 @@
   color: #4caf50;
   font-size: 24px;
   margin-left: 15px; 
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .patient-list-container {
+    margin-top: 50px; /* Still maintain the 50px margin */
+  }
+  
+  .filters-container {
+    justify-content: center; /* Center the filter container on smaller screens */
+    margin-bottom: 20px;
+  }
+  
+  .patient-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-icon {
+    margin-left: 0; /* Align icon with text */
+    margin-bottom: 10px;
+  }
 }
