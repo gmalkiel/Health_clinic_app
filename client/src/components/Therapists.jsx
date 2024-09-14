@@ -92,8 +92,8 @@ const Therapists = () => {
                 />
                 <select value={genderFilter} onChange={handleGenderFilter} className="filter-select">
                     <option value="">מגדר</option>
-                    <option value="גבר">גבר</option>
-                    <option value="אישה">אישה</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
                 </select>
                 <button onClick={handleSort} className="filter-button">
                     מיון לפי שם
