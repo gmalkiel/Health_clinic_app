@@ -91,10 +91,10 @@ const Schedule = ({ userType, username }) => {
         };
         fetchAppointments();
     }, [userType, username]);
-    const IsSeesion = async (PatientID) => {
+    const IsSeesion = async (PatientID,date =new Date()) => {
         try {
-            const cuurentDate = new Date();
-            const response = await fetch(`http://localhost:8080/session_/${PatientID}/${cuurentDate}`);
+            //const cuurentDate = new Date();
+            const response = await fetch(`http://localhost:8080/session_/${PatientID}/${date}`);
             if (response.ok){
             const data = await response.json();
             return data;}
@@ -109,13 +109,13 @@ const Schedule = ({ userType, username }) => {
     const handleEventClick = async (event) => {
         const eventDate = moment(event.start);
         const today = moment();
-    
-        if (eventDate.isBefore(today, 'day')) {
+        let res = IsSeesion(event.PatientID,event.start);
+        if (eventDate.isBefore(today, 'day') ||res) {
             // אם התאריך בעבר - נשלח לעמוד תצוגה בלבד
             navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
         } else if (eventDate.isSame(today, 'day')) {
             try {
-                const res = await IsSeesion(event.PatientID);
+                 res = await IsSeesion(event.PatientID);
                 if (res) {
                     navigate(`/sessions/${res.SessionID}`, { state: { viewOnly: true } });
                 } else {

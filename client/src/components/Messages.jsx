@@ -12,7 +12,9 @@ const Messages = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/messages/${therapistID}`);
+        const response = await fetch(`http://localhost:8080/messages/${therapistID.
+          therapistID
+          }`);
         const data = await response.json();
         setMessages(data); // עדכן את setMessages כך שיתאים למבנה הנתונים
       } catch (err) {
