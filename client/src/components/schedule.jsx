@@ -109,11 +109,13 @@ const Schedule = ({ userType, username }) => {
     const handleEventClick = async (event) => {
         const eventDate = moment(event.start);
         const today = moment();
-        let res = IsSeesion(event.PatientID,event.start);
-        if (eventDate.isBefore(today, 'day') ||res) {
+        if(eventDate.isBefore(today, 'day')|| eventDate.isSame(today, 'day')){
+        let res =await IsSeesion(event.PatientID,event.start);
+        debugger;
+        if (eventDate.isBefore(today, 'day')&&res&&userType=='therapist') {
             // אם התאריך בעבר - נשלח לעמוד תצוגה בלבד
-            navigate(`/sessions/${event.id}`, { state: { viewOnly: true } });
-        } else if (eventDate.isSame(today, 'day')) {
+            navigate(`/sessions/${res.SessionID}`, { state: { viewOnly: true } });
+        } else if (eventDate.isSame(today, 'day')&&userType=='therapist') {
             try {
                  res = await IsSeesion(event.PatientID);
                 if (res) {
@@ -126,7 +128,7 @@ const Schedule = ({ userType, username }) => {
                 console.error('Error checking session:', error);
                 setError('Error checking session data');
             }
-        }
+        }}
     };
     
 

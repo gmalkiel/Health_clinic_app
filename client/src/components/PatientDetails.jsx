@@ -3,13 +3,12 @@ import "../css/AddPatient.css"; // Import the CSS file for styling
 import { useNavigate, useParams } from 'react-router-dom';
 
 const PatientDetails = () => {
-  const { patientID } = useParams();
+  const { patientID, TherapistID } = useParams(); // TherapistID is extracted from URL params
   const [patient, setPatient] = useState(null);
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   useEffect(() => {
-    debugger;
     fetch(`http://localhost:8080/patient/${patientID}`)
       .then((response) => response.json())
       .then((data) => setPatient(data))
@@ -78,7 +77,13 @@ const PatientDetails = () => {
         <label>Remaining Payment:</label>
         <p>{patient.RemainingPayment}</p>
       </div>
-      <button onClick={handleUpdateClick} className="addP_submit-button">Update Patient</button>
+
+      {/* Conditionally render the "Update Patient" button if TherapistID exists and is not empty */}
+      {TherapistID && TherapistID !== "undefined" && TherapistID !== "" && (
+        <button onClick={handleUpdateClick} className="addP_submit-button">
+          Update Patient
+        </button>
+      )}
     </div>
   );
 };

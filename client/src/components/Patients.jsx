@@ -66,7 +66,7 @@ const Patients = () => {
     debugger;
     //const PatientID = patients.at(patientId).PatientID;
     // Navigate to the patient details page
-    navigate(`/PatientDetails/${patientId}`);
+    navigate(`/PatientDetails/${patientId}/${TherapistID}`);
   };
 
   if (error) {
