@@ -293,7 +293,7 @@ app.post('/addPatient', validatePatient, async (req, res) => {
 
   try {
     // בדיקה האם כל השדות החיוניים קיימים
-    if (!TherapistID || !Name || !Age || !IDNumber || !RemainingPayment) {
+    if (!TherapistID || !Name || !Age || !IDNumber ) {
       return res.status(400).send('Missing required fields');
     }
 

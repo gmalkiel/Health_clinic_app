@@ -19,7 +19,9 @@ export const patientSchema = Joi.object({
     EducationalInstitution: Joi.string().optional().allow(null, ''),
     Medication: Joi.string().optional().allow(null, ''),
     ReferralSource: Joi.string().optional().allow(null, ''),
-    RemainingPayment: Joi.number().integer().optional().allow(null)
+    Payment: Joi.number().precision(2).optional().allow(null),
+    RemainingPayment: Joi.number().precision(2).optional().allow(null),
+    RemainingSessions: Joi.number().integer().optional().allow(null)
   });
   
   // Schema for validating Therapist data
