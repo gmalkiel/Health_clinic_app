@@ -108,8 +108,8 @@ const Patients = () => {
           <span><strong>שם:</strong> {patient.Name}</span>
           <span><strong>ת.ז:</strong> {patient.IDNumber}</span>
           <span><strong>גיל:</strong> {patient.Age}</span>
-          <span><strong>טלפון:</strong> {patient.Phone}</span>
-          <span><strong>מייל:</strong> {patient.Mail}</span>
+          <span><strong>מצב משפחתי:</strong> {patient.MaritalStatus}</span>
+          <span><strong>מוסד לימודים:</strong> {patient.EducationalInstitution}</span>
         </div>
       ))}
     </div>
